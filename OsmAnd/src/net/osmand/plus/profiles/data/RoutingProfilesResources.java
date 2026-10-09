@@ -18,6 +18,7 @@ public enum RoutingProfilesResources {
 	HORSEBACKRIDING(R.string.horseback_riding, R.drawable.ic_action_horse),
 	GEOCODING(R.string.routing_profile_geocoding, R.drawable.ic_action_world_globe),
 	MOPED(R.string.app_mode_moped, R.drawable.ic_action_motor_scooter),
+	SPEED_PEDELEC(R.string.app_mode_speed_pedelec, R.drawable.ic_action_speed_pedelec),
 	TRAIN(R.string.app_mode_train, R.drawable.ic_action_train);
 
 	int stringRes;

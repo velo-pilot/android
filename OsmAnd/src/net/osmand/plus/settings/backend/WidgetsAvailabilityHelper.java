@@ -10,6 +10,7 @@ import static net.osmand.plus.settings.backend.ApplicationMode.MOTORCYCLE;
 import static net.osmand.plus.settings.backend.ApplicationMode.PEDESTRIAN;
 import static net.osmand.plus.settings.backend.ApplicationMode.PUBLIC_TRANSPORT;
 import static net.osmand.plus.settings.backend.ApplicationMode.SKI;
+import static net.osmand.plus.settings.backend.ApplicationMode.SPEED_PEDELEC;
 import static net.osmand.plus.settings.backend.ApplicationMode.TRAIN;
 import static net.osmand.plus.settings.backend.ApplicationMode.TRUCK;
 import static net.osmand.plus.views.mapwidgets.WidgetType.ALTITUDE_MAP_CENTER;
@@ -81,14 +82,14 @@ public class WidgetsAvailabilityHelper {
 
 	public static void initRegVisibility(@NonNull OsmandApplication app) {
 		ApplicationMode[] exceptDefault = {CAR, BICYCLE, PEDESTRIAN, PUBLIC_TRANSPORT, BOAT,
-				AIRCRAFT, SKI, TRUCK, MOTORCYCLE, HORSE, MOPED, TRAIN};
+				AIRCRAFT, SKI, TRUCK, MOTORCYCLE, HORSE, MOPED, SPEED_PEDELEC, TRAIN};
 		ApplicationMode[] all = null;
 		ApplicationMode[] none = {};
 
 		// left
-		ApplicationMode[] nextTurnSet = {CAR, BICYCLE, BOAT, SKI, TRUCK, MOTORCYCLE, HORSE, MOPED};
+		ApplicationMode[] nextTurnSet = {CAR, BICYCLE, BOAT, SKI, TRUCK, MOTORCYCLE, HORSE, MOPED, SPEED_PEDELEC};
 		ApplicationMode[] smallNextTurnSet = {PEDESTRIAN, PUBLIC_TRANSPORT, AIRCRAFT, TRAIN};
-		ApplicationMode[] secondNextTurnSet = {CAR, BICYCLE, PEDESTRIAN, BOAT, SKI, TRUCK, MOTORCYCLE, HORSE, MOPED};
+		ApplicationMode[] secondNextTurnSet = {CAR, BICYCLE, PEDESTRIAN, BOAT, SKI, TRUCK, MOTORCYCLE, HORSE, MOPED, SPEED_PEDELEC};
 
 		boolean enableWidgetsV2 = Version.getInstallTime(app) >= ROUTE_WIDGETS_V2_INTRO_TIME_MS;
 		if (enableWidgetsV2) {

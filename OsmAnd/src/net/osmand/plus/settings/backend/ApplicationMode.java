@@ -77,6 +77,9 @@ public class ApplicationMode {
 	public static final ApplicationMode MOPED = create(BICYCLE, R.string.app_mode_moped, "moped")
 			.icon(R.drawable.ic_action_motor_scooter)
 			.description(R.string.app_mode_moped).reg();
+	public static final ApplicationMode SPEED_PEDELEC = create(BICYCLE, R.string.app_mode_speed_pedelec, "speed_pedelec")
+			.icon(R.drawable.ic_action_speed_pedelec)
+			.description(R.string.app_mode_speed_pedelec_descr).reg();
 
 	public static final ApplicationMode PUBLIC_TRANSPORT = createBase(R.string.app_mode_public_transport, "public_transport")
 			.icon(R.drawable.ic_action_bus_dark)
@@ -517,6 +520,9 @@ public class ApplicationMode {
 			if (!settings.APP_MODE_ORDER.isSetForMode(MOPED)) {
 				MOPED.setOrder(PEDESTRIAN.getOrder() + 1);
 			}
+		}
+		if (settings.APP_MODE_ORDER.isSetForMode(MOPED) && !settings.APP_MODE_ORDER.isSetForMode(SPEED_PEDELEC)) {
+			SPEED_PEDELEC.setOrder(MOPED.getOrder() + 1);
 		}
 		if (settings.APP_MODE_ORDER.isSetForMode(SKI) && !settings.APP_MODE_ORDER.isSetForMode(HORSE)) {
 			HORSE.setOrder(SKI.getOrder() + 1);

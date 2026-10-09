@@ -33,6 +33,7 @@ public class RoutingConfiguration {
 	public static final int DEFAULT_NATIVE_MEMORY_LIMIT = 256;
 	public static final float DEVIATION_RADIUS = 3000;
 	public static final double DEFAULT_PENALTY_FOR_REVERSE_DIRECTION = 60; // if no penaltyForReverseDirection in xml
+	private static final String[] BUNDLED_ROUTING_PROFILES = {"/net/osmand/router_profiles/speed_pedelec.xml"};
 	public Map<String, String> attributes = new LinkedHashMap<String, String>();
 
 	// 1. parameters of routing and different tweaks
@@ -340,9 +341,23 @@ public class RoutingConfiguration {
 
 	public static Builder parseDefault() {
 		try {
-			return parseFromInputStream(RoutingConfiguration.class.getResourceAsStream("routing.xml"));
+			Builder builder = parseFromInputStream(RoutingConfiguration.class.getResourceAsStream("routing.xml"));
+			parseBundledProfiles(builder);
+			return builder;
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
+		}
+	}
+
+	// Profiles shipped with this repository rather than with OsmAnd-resources/routing/routing.xml
+	private static void parseBundledProfiles(Builder builder) throws IOException, XmlPullParserException {
+		for (String resource : BUNDLED_ROUTING_PROFILES) {
+			InputStream is = RoutingConfiguration.class.getResourceAsStream(resource);
+			if (is != null) {
+				String defaultRouter = builder.defaultRouter;
+				parseFromInputStream(is, null, builder);
+				builder.defaultRouter = defaultRouter;
+			}
 		}
 	}
 

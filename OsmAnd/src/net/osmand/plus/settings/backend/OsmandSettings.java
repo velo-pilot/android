@@ -1292,6 +1292,7 @@ public class OsmandSettings {
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.DEFAULT, 1.5f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.CAR, 12.5f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.BICYCLE, 2.77f);
+		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, 9.72f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.PEDESTRIAN, 1.11f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.BOAT, 1.38f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.AIRCRAFT, 200f);
@@ -1323,6 +1324,7 @@ public class OsmandSettings {
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.PEDESTRIAN, "ic_action_pedestrian_dark");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.PUBLIC_TRANSPORT, "ic_action_bus_dark");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.MOPED, "ic_action_motor_scooter");
+		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, "ic_action_speed_pedelec");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.BOAT, "ic_action_sail_boat_dark");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.AIRCRAFT, "ic_action_aircraft");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.SKI, "ic_action_skiing");
@@ -1360,6 +1362,7 @@ public class OsmandSettings {
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.SKI, "ski");
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.HORSE, "horsebackriding");
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.MOPED, "moped");
+		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, "speed_pedelec");
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.TRAIN, "train");
 	}
 
@@ -1415,12 +1418,13 @@ public class OsmandSettings {
 		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.TRUCK, 4);
 		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.MOTORCYCLE, 5);
 		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.MOPED, 6);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.PUBLIC_TRANSPORT, 7);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.TRAIN, 8);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.BOAT, 9);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.AIRCRAFT, 10);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.SKI, 11);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.HORSE, 12);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, 7);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.PUBLIC_TRANSPORT, 8);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.TRAIN, 9);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.BOAT, 10);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.AIRCRAFT, 11);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.SKI, 12);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.HORSE, 13);
 	}
 
 	public final CommonPreference<Integer> APP_MODE_VERSION = new IntPreference(this, "app_mode_version", 0).makeProfile().cache();
@@ -1704,6 +1708,7 @@ public class OsmandSettings {
 		SHOW_SPEEDOMETER.setModeDefaultValue(ApplicationMode.TRUCK, true);
 		SHOW_SPEEDOMETER.setModeDefaultValue(ApplicationMode.MOTORCYCLE, true);
 		SHOW_SPEEDOMETER.setModeDefaultValue(ApplicationMode.MOPED, true);
+		SHOW_SPEEDOMETER.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, true);
 	}
 
 	public final CommonPreference<WidgetSize> SPEEDOMETER_SIZE = new EnumStringPreference<>(this, "speedometer_size", MEDIUM, WidgetSize.values()).makeProfile();
@@ -1806,6 +1811,7 @@ public class OsmandSettings {
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.MOTORCYCLE, "adventure_motorcycling");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.HORSE, "horse_riding");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.MOPED, "motor_scooter");
+		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, "e_biking");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.PEDESTRIAN, "walking");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.SKI, "skiing");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.TRAIN, "train_riding");

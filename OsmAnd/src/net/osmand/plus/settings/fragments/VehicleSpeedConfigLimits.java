@@ -20,6 +20,7 @@ public class VehicleSpeedConfigLimits {
 	public static final float MAX_SKI_SPEED_LIMIT = 225;
 	public static final float MAX_PUBLIC_TRANSPORT_SPEED_LIMIT = 142.5f;
 	public static final float MAX_MOPED_SPEED_LIMIT = 70;
+	public static final float MAX_SPEED_PEDELEC_SPEED_LIMIT = 45;
 	public static final float MAX_TRAIN_SPEED_LIMIT = 255;
 	public static final float MAX_STRAIGHT_SPEED_LIMIT = 1080;
 	public static final float MAX_DIRECT_TO_SPEED_LIMIT = 1080;
@@ -59,6 +60,8 @@ public class VehicleSpeedConfigLimits {
 				return MAX_PUBLIC_TRANSPORT_SPEED_LIMIT;
 			case "moped":
 				return MAX_MOPED_SPEED_LIMIT;
+			case "speed_pedelec":
+				return MAX_SPEED_PEDELEC_SPEED_LIMIT;
 			case "train":
 				return MAX_TRAIN_SPEED_LIMIT;
 		}

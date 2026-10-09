@@ -11,6 +11,20 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="app_mode_speed_pedelec">Speed pedelec</string>
+	<string name="app_mode_speed_pedelec_descr">E-bike with pedal assistance up to 45 km/h. Follows moped access rules.</string>
+	<string name="routing_attr_moped_rules_name">Moped rules (outside Belgium)</string>
+	<string name="routing_attr_moped_rules_description">Use cycle paths and roads closed to motor vehicles only where mopeds are explicitly allowed, as in the Netherlands, Germany or France. Off: Belgian rules for speed pedelecs (class P).</string>
+	<string name="routing_attr_allow_closed_to_vehicles_name">Use roads closed to vehicles</string>
+	<string name="routing_attr_allow_closed_to_vehicles_description">Also use roads and towpaths closed to vehicles but open to cyclists (F99a/b) outside signposted cycle routes. Legal only where the sign shows the speed pedelec symbol.</string>
+	<string name="routing_attr_avoid_closed_to_vehicles_name">No roads closed to vehicles</string>
+	<string name="routing_attr_avoid_closed_to_vehicles_description">Avoids roads and towpaths closed to vehicles (F99a/b), also on signposted cycle routes.</string>
+	<string name="routing_attr_avoid_moped_no_cycleways_name">No cycle paths closed to mopeds</string>
+	<string name="routing_attr_avoid_moped_no_cycleways_description">Avoids cycle paths closed to mopeds. In Belgium these can be open (D7 + M7) or closed (D7 + M16) to speed pedelecs.</string>
+	<string name="routing_attr_allow_bicycle_contraflow_name">Use cycle contraflow</string>
+	<string name="routing_attr_allow_bicycle_contraflow_description">Ride against one-way traffic where cyclists may. Legal only where the sign shows the speed pedelec symbol.</string>
+	<string name="routing_attr_allow_pedestrian_zones_name">Use pedestrian zones</string>
+	<string name="routing_attr_allow_pedestrian_zones_description">Ride through pedestrian zones at walking pace. Legal only where the sign allows speed pedelecs.</string>
 	<string name="astro_eclipse_column_below_horizon">Below horizon</string>
 	<string name="quick_action_add_track">Add track</string>
 	<string name="quick_action_tracks_select_descr">Add one or more tracks to show or hide them on the map with a single tap.</string>
