@@ -32,6 +32,7 @@ tasks.register('collectMiscResources', Copy) {
 
 tasks.register('collectRenderingStylesResources', Sync) {
 	from "../../resources/rendering_styles"
+	from "src/main/rendering_styles" // styles kept in this repository
 	into "src/main/resources/net/osmand/render"
 	include "*.xml"
 }

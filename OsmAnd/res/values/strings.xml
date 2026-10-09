@@ -11,6 +11,9 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="speed_pedelec_render_descr">Highlights cycle highways, cycle paths and railways, which often have a cycle path alongside. Motorways and trunk roads are muted.</string>
+	<string name="rendering_attr_hideCycleHighways_name">Hide cycle highways</string>
+	<string name="rendering_attr_hideCycleHighways_description">Hide the bold rendering of cycle highways and national cycle routes</string>
 	<string name="app_mode_speed_pedelec">Speed pedelec</string>
 	<string name="app_mode_speed_pedelec_descr">E-bike with pedal assistance up to 45 km/h. Follows moped access rules.</string>
 	<string name="routing_attr_moped_rules_name">Moped rules (outside Belgium)</string>

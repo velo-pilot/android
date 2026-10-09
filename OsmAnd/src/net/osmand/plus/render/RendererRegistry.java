@@ -41,6 +41,7 @@ public class RendererRegistry {
 	public static final String DEFAULT_RENDER = "OsmAnd";
 	public static final String DEFAULT_RENDER_FILE_PATH = "default.render.xml";
 	public static final String TOURING_VIEW = "Touring view (contrast and details)";
+	public static final String SPEED_PEDELEC_RENDER = "Speed pedelec";
 	public static final String WINTER_SKI_RENDER = "Winter and ski";
 	public static final String NAUTICAL_RENDER = "Nautical";
 	public static final String MARINE_RENDER = "Marine";
@@ -84,6 +85,7 @@ public class RendererRegistry {
 		this.app = app;
 		internalRenderers.put(DEFAULT_RENDER, DEFAULT_RENDER_FILE_PATH);
 		internalRenderers.put(TOURING_VIEW, "Touring-view_(more-contrast-and-details)" + RENDERER_INDEX_EXT);
+		internalRenderers.put(SPEED_PEDELEC_RENDER, "speed_pedelec" + RENDERER_INDEX_EXT);
 		internalRenderers.put(TOPO_RENDER, "topo" + RENDERER_INDEX_EXT);
 		internalRenderers.put(OSM_CARTO_RENDER, "osm-carto" + RENDERER_INDEX_EXT);
 		internalRenderers.put(LIGHTRS_RENDER, "LightRS" + RENDERER_INDEX_EXT);
@@ -419,6 +421,8 @@ public class RendererRegistry {
 		switch (key) {
 			case TOURING_VIEW:
 				return ctx.getString(R.string.touring_view_renderer);
+			case SPEED_PEDELEC_RENDER:
+				return ctx.getString(R.string.app_mode_speed_pedelec);
 			case WINTER_SKI_RENDER:
 				return ctx.getString(R.string.winter_and_ski_renderer);
 			case NAUTICAL_RENDER:
@@ -436,6 +440,8 @@ public class RendererRegistry {
 				return ctx.getString(R.string.default_render_descr);
 			case TOURING_VIEW:
 				return ctx.getString(R.string.touring_view_render_descr);
+			case SPEED_PEDELEC_RENDER:
+				return ctx.getString(R.string.speed_pedelec_render_descr);
 			case OSM_CARTO_RENDER:
 				return ctx.getString(R.string.osm_carto_render_descr);
 			case TOPO_RENDER:

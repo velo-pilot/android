@@ -3196,6 +3196,7 @@ public class OsmandSettings {
 	{
 		RENDERER.setModeDefaultValue(ApplicationMode.BOAT, RendererRegistry.NAUTICAL_RENDER);
 		RENDERER.setModeDefaultValue(ApplicationMode.SKI, RendererRegistry.WINTER_SKI_RENDER);
+		RENDERER.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, RendererRegistry.SPEED_PEDELEC_RENDER);
 	}
 
 	public boolean getRenderBooleanPropertyValue(@NonNull RenderingRuleProperty property) {

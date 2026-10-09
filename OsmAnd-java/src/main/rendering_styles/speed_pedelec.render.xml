@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	"Speed pedelec": the OsmAnd default map style tuned for riding a speed pedelec (45 km/h e-bike).
+	Copied into net/osmand/render next to the styles from OsmAnd-resources by the
+	collectRenderingStylesResources task, and registered in RendererRegistry.
+
+	  * Cycle highways (fietssnelwegen F1, F11, ..., LF routes, RAVeL): national cycle network routes
+	    that are not node networks, drawn as a bold teal line from zoom 9 and labelled with their
+	    number in the blue rounded-triangle sign from zoom 11. OsmAnd maps keep cycle_network and
+	    state only as text, so proposed sections are drawn too.
+	    Toggle: Configure map > Details > Hide cycle highways.
+	  * Cycle paths: solid instead of dashed, a stronger blue, and visible from zoom 12.
+	  * Railways: darker and wider, visible from zoom 9. Many cycle paths run next to them, so they
+	    help to find your way.
+	  * Motorways and trunk roads: muted grey. A speed pedelec may not use them.
+
+	Only rules that do not depend on shared rules of the default style are replaced: railway=rail,
+	and highway=cycleway up to zoom 13. Everything else changes colours or rendering constants,
+	so tunnels, bridges and the other default details keep working.
+-->
+<renderingStyle name="speed_pedelec" depends="default" defaultColor="#ebe7e4" version="1">
+
+	<renderingProperty attr="hideCycleHighways" name="Hide cycle highways"
+		description="Hide the bold rendering of cycle highways and national cycle routes"
+		type="boolean" possibleValues="" category="hide"/>
+
+	<renderingConstant name="spCycleHighwayColor" value="#0A7C86"/>
+	<renderingConstant name="spCycleHighwayNightColor" value="#2FC4CF"/>
+	<renderingConstant name="spCycleHighwayCasingColor" value="#ccffffff"/>
+	<renderingConstant name="spCycleHighwayCasingNightColor" value="#aa000000"/>
+
+	<renderingConstant name="spCyclewayColor" value="#0A64C8"/>
+	<renderingConstant name="spCyclewayNightColor" value="#3FB6FF"/>
+	<renderingConstant name="spCyclewayCasingColor" value="#ccffffff"/>
+	<renderingConstant name="spCyclewayCasingNightColor" value="#99000000"/>
+
+	<renderingConstant name="spRailwayColor" value="#4D4D4D"/>
+	<renderingConstant name="spRailwayNightColor" value="#8FA9B0"/>
+	<renderingConstant name="spRailwayDashColor" value="#ffffff"/>
+	<renderingConstant name="spRailwayDashNightColor" value="#2B3A3E"/>
+
+	<renderingConstant name="spMotorwayColor" value="#D6D2CD"/>
+	<renderingConstant name="spMotorwayTunnelColor" value="#E2DFDB"/>
+	<renderingConstant name="spMotorwayCasingColor" value="#BCB7B1"/>
+	<renderingConstant name="spMotorwayNightColor" value="#4A5256"/>
+	<renderingConstant name="spMotorwayTunnelNightColor" value="#33393C"/>
+	<renderingConstant name="spMotorwayCasingNightColor" value="#33393C"/>
+	<renderingConstant name="spTrunkColor" value="#DCD8D3"/>
+	<renderingConstant name="spTrunkCasingColor" value="#C3BEB8"/>
+	<renderingConstant name="spTrunkNightColor" value="#4D5559"/>
+	<renderingConstant name="spTrunkCasingNightColor" value="#363C3F"/>
+
+	<!-- Cycle paths at zoom 14 and above keep the default rule; make them solid -->
+	<renderingConstant name="cyclewayPathEffect" value=""/>
+	<renderingConstant name="cyclewayStrokeWidth" value="1.2:1"/>
+
+	<renderingAttribute name="cyclewayColor">
+		<case attrColorValue="$spCyclewayColor">
+			<apply_if nightMode="true" attrColorValue="$spCyclewayNightColor"/>
+		</case>
+	</renderingAttribute>
+
+	<!-- Motorways and trunk roads (and their links) recede into the background -->
+	<renderingAttribute name="motorwayRoadColor">
+		<case additional="tunnel=yes" attrColorValue="$spMotorwayTunnelColor">
+			<apply_if nightMode="true" attrColorValue="$spMotorwayTunnelNightColor"/>
+		</case>
+		<case attrColorValue="$spMotorwayColor">
+			<apply_if nightMode="true" attrColorValue="$spMotorwayNightColor"/>
+		</case>
+	</renderingAttribute>
+	<renderingAttribute name="motorwayRoadLowZoomColor">
+		<case attrColorValue="$spMotorwayColor">
+			<apply_if nightMode="true" attrColorValue="$spMotorwayNightColor"/>
+		</case>
+	</renderingAttribute>
+	<renderingAttribute name="motorwayRoadShadowColor">
+		<case additional="construction=yes" attrColorValue="#00000000"/>
+		<case attrColorValue="$spMotorwayCasingColor">
+			<apply_if nightMode="true" attrColorValue="$spMotorwayCasingNightColor"/>
+		</case>
+	</renderingAttribute>
+	<renderingAttribute name="trunkRoadColor">
+		<case additional="tunnel=yes" attrColorValue="$spMotorwayTunnelColor">
+			<apply_if nightMode="true" attrColorValue="$spMotorwayTunnelNightColor"/>
+		</case>
+		<case attrColorValue="$spTrunkColor">
+			<apply_if nightMode="true" attrColorValue="$spTrunkNightColor"/>
+		</case>
+	</renderingAttribute>
+	<renderingAttribute name="trunkRoadLowZoomColor">
+		<case attrColorValue="$spTrunkColor">
+			<apply_if nightMode="true" attrColorValue="$spTrunkNightColor"/>
+		</case>
+	</renderingAttribute>
+	<renderingAttribute name="trunkRoadShadowColor">
+		<case additional="construction=yes" attrColorValue="#00000000"/>
+		<case attrColorValue="$spTrunkCasingColor">
+			<apply_if nightMode="true" attrColorValue="$spTrunkCasingNightColor"/>
+		</case>
+	</renderingAttribute>
+
+	<order>
+		<!-- The default style hides railways up to zoom 10 and cycle paths up to zoom 12 -->
+		<case minzoom="9" maxzoom="10" area="false" objectType="2" tag="railway" value="rail" order="77">
+			<apply_if additional="service=spur" order="-1"/>
+			<apply_if additional="service=siding" order="-1"/>
+			<apply_if additional="service=yard" order="-1"/>
+			<apply_if additional="tunnel=yes" order="-1"/>
+		</case>
+		<case minzoom="12" maxzoom="12" area="false" objectType="2" tag="highway" value="cycleway" order="177">
+			<apply_if additional="tunnel=yes" order="-1"/>
+		</case>
+	</order>
+
+	<text>
+		<switch hideCycleHighways="false" minzoom="11" tag="route_type" value="cycling" additional="route_activity_type=road_cycling">
+			<switch additional="network=ncn">
+				<switch additional="!node_network">
+					<!-- Cycle highway number in the upward blue triangle of the road sign (F1, C1, ...) -->
+					<case additional="!track_color" nameTag="ref" textOnPath="false" textBold="true" textOrder="40" textMinDistance="150" textWrapWidth="10"
+						textColor="#ffffff" textHaloColor="#00000000" textHaloRadius="0">
+						<case textLength="1" textShield="blue_rounded_up_triangle_1_road_shield"/>
+						<case textLength="2" textShield="blue_rounded_up_triangle_2_road_shield"/>
+						<case textLength="3" textShield="blue_rounded_up_triangle_3_road_shield"/>
+						<case textLength="4" textShield="blue_rounded_up_triangle_4_road_shield"/>
+						<case textShield="blue_rounded_up_triangle_5_road_shield"/>
+						<apply_if maxzoom="12" textSize="10"/>
+						<apply_if minzoom="13" maxzoom="14" textSize="12"/>
+						<apply_if minzoom="15" textSize="13"/>
+					</case>
+					<!-- Recreational national routes (Flemish icoonroutes): name along the line, no sign -->
+					<case minzoom="14" nameTag="ref" textOnPath="true" textSize="11" textOrder="60" textMinDistance="300"
+						textColor="#555555" textHaloColor="#ccffffff" textHaloRadius="2">
+						<apply_if nightMode="true" textColor="#aaaaaa" textHaloColor="#aa000000"/>
+					</case>
+				</switch>
+			</switch>
+		</switch>
+	</text>
+
+	<point>
+	</point>
+
+	<polygon>
+	</polygon>
+
+	<line>
+		<!-- National cycle network routes that are not node networks. Cycle highways (F1, C1, ...) have no
+		     route colour; recreational routes such as the Flemish icoonroutes (Kunststedenroute,
+		     Heuvelroute, ...) carry one (track_color) and get a thin line in that colour instead. -->
+		<switch hideCycleHighways="false" minzoom="9" tag="route_type" value="cycling" additional="route_activity_type=road_cycling" cap="ROUND">
+			<switch additional="network=ncn">
+				<switch additional="!node_network">
+				<case minzoom="11" additional="track_color" color="#80666666">
+					<case additional="track_color=red" color="#80e40613"/>
+					<case additional="track_color=orange" color="#80f29200"/>
+					<case additional="track_color=yellow" color="#80c8a400"/>
+					<case additional="track_color=green" color="#8038a838"/>
+					<case additional="track_color=blue" color="#803060c0"/>
+					<case additional="track_color=purple" color="#808040a0"/>
+					<case additional="track_color=brown" color="#80905a30"/>
+					<case/>
+					<apply_if maxzoom="13" strokeWidth="1.5:1"/>
+					<apply_if minzoom="14" maxzoom="15" strokeWidth="2:2"/>
+					<apply_if minzoom="16" strokeWidth="3:3"/>
+				</case>
+				<case additional="!track_color" color="$spCycleHighwayColor" color__1="$spCycleHighwayCasingColor">
+					<apply_if maxzoom="10" strokeWidth="2:2" strokeWidth__1="3.5:3.5"/>
+					<apply_if minzoom="11" maxzoom="12" strokeWidth="3:3" strokeWidth__1="5:5"/>
+					<apply_if minzoom="13" maxzoom="13" strokeWidth="4:4" strokeWidth__1="6.5:6.5"/>
+					<apply_if minzoom="14" maxzoom="15" strokeWidth="5:5" strokeWidth__1="8:8"/>
+					<apply_if minzoom="16" maxzoom="16" strokeWidth="6:6" strokeWidth__1="9.5:9.5"/>
+					<apply_if minzoom="17" strokeWidth="7:7" strokeWidth__1="11:11"/>
+					<apply_if nightMode="true" color="$spCycleHighwayNightColor" color__1="$spCycleHighwayCasingNightColor"/>
+				</case>
+				</switch>
+			</switch>
+		</switch>
+
+		<!-- Cycle paths (also paths designated for cyclists): solid, wider and with a casing from zoom 12,
+		     where the default style starts at zoom 14. With road surface or road quality display on, the
+		     default rule takes over from zoom 14 so that its surface overlay keeps working. -->
+		<switch minzoom="12" color="$cyclewayColor" color__1="$spCyclewayCasingColor" cap="ROUND">
+			<case maxzoom="13" tag="highway" value="cycleway"/>
+			<case minzoom="14" showSurfaces="false" showSurfaceGrade="false" tag="highway" value="cycleway"/>
+			<case maxzoom="13" tag="highway" value="path" additional="bicycle=designated"/>
+			<case minzoom="14" showSurfaces="false" showSurfaceGrade="false" tag="highway" value="path" additional="bicycle=designated"/>
+			<apply_if maxzoom="12" strokeWidth="1:1" strokeWidth__1="0"/>
+			<apply_if minzoom="13" maxzoom="13" strokeWidth="1.2:1" strokeWidth__1="2.4:2"/>
+			<apply_if minzoom="14" maxzoom="14" strokeWidth="1.5:1" strokeWidth__1="3:2"/>
+			<apply_if minzoom="15" maxzoom="15" strokeWidth="2:2" strokeWidth__1="3.6:3"/>
+			<apply_if minzoom="16" maxzoom="16" strokeWidth="2.4:2" strokeWidth__1="4.2:4"/>
+			<apply_if minzoom="17" strokeWidth="3:3" strokeWidth__1="5:5"/>
+			<apply_if nightMode="true" color__1="$spCyclewayCasingNightColor"/>
+			<apply_if additional="tunnel=yes" pathEffect="4_3"/>
+			<apply_if minzoom="14" additional="bridge=yes" color__1="#000000">
+				<apply_if nightMode="true" color__1="#ffffff"/>
+			</apply_if>
+		</switch>
+
+		<!-- Railways (in use): darker and wider than in the default style, same structure.
+		     Abandoned and disused railways keep the default rendering. -->
+		<case minzoom="9" tag="railway" value="rail">
+			<case additional="tunnel=yes">
+				<apply_if maxzoom="13" strokeWidth="1.2:1" pathEffect="5_2"/>
+				<apply_if minzoom="14" strokeWidth="2:2" color_2="$spRailwayDashColor" strokeWidth_2="1:1" pathEffect_2="4_4"/>
+			</case>
+			<case additional="bridge=yes" minzoom="14" color__1="#000000" strokeWidth__1="6:2" color_0="#ffffff" strokeWidth_0="4.5:2"
+				strokeWidth="2.5:2" color_2="$spRailwayDashColor" strokeWidth_2="1.2:1" pathEffect_2="0_11_8_1">
+				<apply_if nightMode="true" color__1="#ffffff" color_0="#000000"/>
+			</case>
+			<case maxzoom="9" strokeWidth="1.1"/>
+			<case maxzoom="10" strokeWidth="1.4:1"/>
+			<case maxzoom="12" strokeWidth="1.6:1"/>
+			<case maxzoom="13" strokeWidth="2:2" color_2="$spRailwayDashColor" strokeWidth_2="1:1" pathEffect_2="8_12"/>
+			<case minzoom="14" strokeWidth="2.5:2" color_2="$spRailwayDashColor" strokeWidth_2="1.2:1" pathEffect_2="0_11_8_1"/>
+			<apply color="$spRailwayColor">
+				<apply_if nightMode="true" color="$spRailwayNightColor" color_2="$spRailwayDashNightColor"/>
+			</apply>
+			<apply_if additional="service=spur" color="#9A9A9A" color_2="#eeeeee">
+				<apply_if nightMode="true" color="#4E6E76" color_2="#2B3A3E"/>
+			</apply_if>
+		</case>
+	</line>
+
+</renderingStyle>
