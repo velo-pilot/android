@@ -1,0 +1,30 @@
+# Build environment for the OsmAnd Android app: JDK 17 and the Android SDK packages from
+# versions.gradle. build-apk.sh passes those versions as build arguments and mounts the sources,
+# OsmAnd-resources and the Gradle cache at run time.
+FROM docker.io/library/eclipse-temurin:17-jdk-noble
+
+ARG CMDLINE_TOOLS_ZIP=commandlinetools-linux-16111833_latest.zip
+ARG CMDLINE_TOOLS_SHA1=e025545c62a8e64c7559119566a569fb1dec5f60
+ARG ANDROID_COMPILE_SDK=36
+ARG ANDROID_BUILD_TOOLS=36.0.0
+
+ENV ANDROID_HOME=/opt/android-sdk
+ENV ANDROID_SDK_ROOT=/opt/android-sdk \
+    PATH=$PATH:/opt/android-sdk/cmdline-tools/latest/bin
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl git unzip \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSLo /tmp/cmdline-tools.zip "https://dl.google.com/android/repository/${CMDLINE_TOOLS_ZIP}" \
+ && echo "${CMDLINE_TOOLS_SHA1}  /tmp/cmdline-tools.zip" | sha1sum -c - \
+ && mkdir -p "$ANDROID_HOME/cmdline-tools" \
+ && unzip -q /tmp/cmdline-tools.zip -d "$ANDROID_HOME/cmdline-tools" \
+ && mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest" \
+ && rm /tmp/cmdline-tools.zip
+
+RUN yes | sdkmanager --licenses > /dev/null \
+ && sdkmanager --install "platforms;android-${ANDROID_COMPILE_SDK}" "build-tools;${ANDROID_BUILD_TOOLS}" \
+ && rm -rf "$ANDROID_HOME/.temp"
+
+WORKDIR /work
