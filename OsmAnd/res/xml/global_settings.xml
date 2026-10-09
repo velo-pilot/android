@@ -50,6 +50,14 @@
 		tools:icon="@drawable/ic_action_folder_media" />
 
 	<Preference
+		android:key="shared_osmand_maps"
+		android:layout="@layout/preference_with_descr"
+		android:persistent="false"
+		android:title="@string/shared_osmand_maps"
+		app:isPreferenceVisible="false"
+		tools:icon="@drawable/ic_map" />
+
+	<Preference
 		android:layout="@layout/simple_divider_item"
 		android:selectable="false" />
 

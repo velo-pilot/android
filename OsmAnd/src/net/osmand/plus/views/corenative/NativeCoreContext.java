@@ -20,10 +20,12 @@ import net.osmand.plus.inapp.InAppPurchaseUtils;
 import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.plugins.openseamaps.NauticalMapsPlugin;
 import net.osmand.plus.plugins.srtm.SRTMPlugin;
+import net.osmand.plus.resources.SharedMapsHelper;
 import net.osmand.plus.utils.AndroidUtils;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,6 +77,9 @@ public class NativeCoreContext {
 				if (app.getSettings().SHOW_TRAVEL.get()) {
 					obfsCollection.addDirectory(app.getAppPath(IndexConstants.WIKIVOYAGE_INDEX_DIR).getAbsolutePath(), false);
 				}
+				// Read-only maps of another OsmAnd app, see SharedMapsHelper
+				addFiles(obfsCollection, SharedMapsHelper.collectMaps(app, ""));
+				addFiles(obfsCollection, SharedMapsHelper.collectMaps(app, IndexConstants.ROADS_INDEX_DIR));
 				obfsCollectionsByProviderType.put(ProviderType.MAIN, obfsCollection);
 
 				ObfsCollection contourLinesObfsCollection = null;
@@ -92,10 +97,13 @@ public class NativeCoreContext {
 						srtmIndexDir.mkdir();
 					}
 					obfsCollection.addDirectory(srtmIndexDir.getAbsolutePath(), false);
+					List<File> sharedSrtmFiles = SharedMapsHelper.collectMaps(app, IndexConstants.SRTM_INDEX_DIR);
+					addFiles(obfsCollection, sharedSrtmFiles);
 
 					contourLinesObfsCollection = new ObfsCollection();
 					contourLinesObfsCollection.setIndexCacheFile(cacheFilePath);
 					contourLinesObfsCollection.addDirectory(srtmIndexDir.getAbsolutePath(), false);
+					addFiles(contourLinesObfsCollection, sharedSrtmFiles);
 					obfsCollectionsByProviderType.put(ProviderType.CONTOUR_LINES, contourLinesObfsCollection);
 				}
 
@@ -116,5 +124,11 @@ public class NativeCoreContext {
 		}
 		mapRendererContext = new MapRendererContext(app, density);
 		mapRendererContext.setupObfMap(new MapStylesCollection(), obfsCollectionsByProviderType);
+	}
+
+	private static void addFiles(@NonNull ObfsCollection obfsCollection, @NonNull List<File> files) {
+		for (File file : files) {
+			obfsCollection.addFile(file.getAbsolutePath());
+		}
 	}
 }

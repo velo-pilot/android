@@ -15,6 +15,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import androidx.preference.SwitchPreferenceCompat;
 
+import net.osmand.IndexConstants;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.RestartActivity;
 import net.osmand.plus.dialogs.LocationSourceBottomSheet;
@@ -25,6 +26,7 @@ import net.osmand.plus.feedback.SendAnalyticsBottomSheetDialogFragment.OnSendAna
 import net.osmand.plus.helpers.SupportedLocale;
 import net.osmand.plus.profiles.SelectDefaultProfileBottomSheet;
 import net.osmand.plus.profiles.SelectProfileBottomSheet.OnSelectProfileCallback;
+import net.osmand.plus.resources.SharedMapsHelper;
 import net.osmand.plus.settings.backend.ApplicationMode;
 import net.osmand.plus.settings.backend.OsmandSettings;
 import net.osmand.plus.settings.datastorage.DataStorageHelper;
@@ -32,7 +34,10 @@ import net.osmand.plus.settings.datastorage.item.StorageItem;
 import net.osmand.plus.settings.enums.LocationSource;
 import net.osmand.plus.settings.preferences.ListPreferenceEx;
 import net.osmand.plus.settings.preferences.SwitchPreferenceEx;
+import net.osmand.plus.utils.AndroidUtils;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 
@@ -48,6 +53,9 @@ public class GlobalSettingsFragment extends BaseSettingsFragment
 	private static final String SEND_UNIQUE_USER_IDENTIFIER_PREF_ID = "send_unique_user_identifier";
 	private static final String ENABLE_PROXY_PREF_ID = "enable_proxy";
 	private static final String MEDIA_STORAGE_PREF_ID = "media_storage";
+	private static final String SHARED_OSMAND_MAPS_PREF_ID = "shared_osmand_maps";
+
+	private boolean sharedMapsAccessRequested;
 
 	@Override
 	protected void setupPreferences() {
@@ -56,6 +64,7 @@ public class GlobalSettingsFragment extends BaseSettingsFragment
 		setupMapRenderingEnginePref();
 		setupExternalStorageDirPref();
 		setupMediaStoragePref();
+		setupSharedOsmAndMapsPref();
 
 		setupSendAnonymousDataPref();
 		setupSendUniqueIdentifiersPreference();
@@ -65,6 +74,16 @@ public class GlobalSettingsFragment extends BaseSettingsFragment
 		setupLocationSourcePref();
 		setupAutoBackupPref();
 		setupUninstallSpeedCamerasPref();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		// Android applies access to the obb folders of other apps only to a newly started process
+		if (sharedMapsAccessRequested && !SharedMapsHelper.needsAccess(app)) {
+			sharedMapsAccessRequested = false;
+			callActivity(RestartActivity::requestRestart);
+		}
 	}
 
 	@Override
@@ -191,6 +210,10 @@ public class GlobalSettingsFragment extends BaseSettingsFragment
 			}
 		} else if (prefId.equals(MAP_RENDERING_ENGINE_ID)) {
 			new MapRenderingEngineDialog(app, getActivity()).showDialog(this::setupMapRenderingEnginePref);
+		} else if (prefId.equals(SHARED_OSMAND_MAPS_PREF_ID)) {
+			sharedMapsAccessRequested = SharedMapsHelper.needsAccess(app);
+			AndroidUtils.startActivityIfSafe(requireContext(), SharedMapsHelper.getAccessSettingsIntent(app));
+			return true;
 		}
 
 		return super.onPreferenceClick(preference);
@@ -256,6 +279,27 @@ public class GlobalSettingsFragment extends BaseSettingsFragment
 		Preference preference = findPreference(MEDIA_STORAGE_PREF_ID);
 		preference.setIcon(getContentIcon(R.drawable.ic_action_folder_media));
 		preference.setSummary(settings.MEDIA_STORAGE_TYPE.get().toHumanString(app));
+	}
+
+	private void setupSharedOsmAndMapsPref() {
+		Preference preference = findPreference(SHARED_OSMAND_MAPS_PREF_ID);
+		preference.setVisible(SharedMapsHelper.isSupported());
+		if (!SharedMapsHelper.isSupported()) {
+			return;
+		}
+		preference.setIcon(getContentIcon(R.drawable.ic_map));
+		if (SharedMapsHelper.needsAccess(app)) {
+			preference.setSummary(R.string.shared_osmand_maps_no_access);
+		} else {
+			List<File> dirs = SharedMapsHelper.getSharedDataDirs(app);
+			int count = SharedMapsHelper.collectMaps(app, "").size()
+					+ SharedMapsHelper.collectMaps(app, IndexConstants.ROADS_INDEX_DIR).size();
+			if (dirs.isEmpty() || count == 0) {
+				preference.setSummary(R.string.shared_osmand_maps_not_found);
+			} else {
+				preference.setSummary(getString(R.string.shared_osmand_maps_found, count, dirs.get(0).getAbsolutePath()));
+			}
+		}
 	}
 
 	private void setupMapRenderingEnginePref() {

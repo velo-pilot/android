@@ -11,6 +11,10 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="shared_osmand_maps">Maps from OsmAnd</string>
+	<string name="shared_osmand_maps_no_access">Use the maps of the OsmAnd app instead of downloading them again. Tap to allow access (Install unknown apps), then set the data storage folder in OsmAnd to Multiuser storage.</string>
+	<string name="shared_osmand_maps_not_found">No OsmAnd maps found. In OsmAnd, set the data storage folder to Multiuser storage and choose &quot;Move to the new destination&quot;, so that the maps are moved there.</string>
+	<string name="shared_osmand_maps_found">%1$d maps in use from %2$s</string>
 	<string name="speed_pedelec_render_descr">Highlights cycle highways, cycle paths and railways, which often have a cycle path alongside. Motorways and trunk roads are muted.</string>
 	<string name="rendering_attr_hideCycleHighways_name">Hide cycle highways</string>
 	<string name="rendering_attr_hideCycleHighways_description">Hide the bold rendering of cycle highways and national cycle routes</string>

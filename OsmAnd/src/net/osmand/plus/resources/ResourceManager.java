@@ -528,12 +528,17 @@ public class ResourceManager {
 		FileUtils.collectFiles(appPath, BINARY_MAP_INDEX_EXT, files);
 		renameRoadsFiles(files, roadsPath);
 		FileUtils.collectFiles(roadsPath, BINARY_MAP_INDEX_EXT, files);
+		// Read-only maps of another OsmAnd app, see SharedMapsHelper
+		files.addAll(SharedMapsHelper.collectMaps(app, ""));
+		files.addAll(SharedMapsHelper.collectMaps(app, ROADS_INDEX_DIR));
 		if (Version.isPaidVersion(app)) {
 			FileUtils.collectFiles(app.getAppPath(WIKI_INDEX_DIR), BINARY_MAP_INDEX_EXT, files);
 			FileUtils.collectFiles(app.getAppPath(WIKIVOYAGE_INDEX_DIR), BINARY_TRAVEL_GUIDE_MAP_INDEX_EXT, files);
+			files.addAll(SharedMapsHelper.collectMaps(app, WIKI_INDEX_DIR));
 		}
 		if (PluginsHelper.isActive(SRTMPlugin.class) || InAppPurchaseUtils.isContourLinesAvailable(app)) {
 			FileUtils.collectFiles(app.getAppPath(SRTM_INDEX_DIR), BINARY_MAP_INDEX_EXT, files);
+			files.addAll(SharedMapsHelper.collectMaps(app, SRTM_INDEX_DIR));
 		}
 		if (PluginsHelper.isActive(NauticalMapsPlugin.class) || InAppPurchaseUtils.isDepthContoursAvailable(app)) {
 			FileUtils.collectFiles(app.getAppPath(NAUTICAL_INDEX_DIR), BINARY_DEPTH_MAP_INDEX_EXT, files);
