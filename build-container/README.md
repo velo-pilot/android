@@ -10,26 +10,26 @@ The first run builds the image (JDK 17 and the Android SDK packages from `versio
 [OsmAnd-resources](https://github.com/osmandapp/OsmAnd-resources) next to this repository (the build reads
 `../resources`) and fills the Gradle cache in `~/.cache/osmand-builder`. Later runs reuse all three.
 
-The default task, `assembleSpeedPedelecOpenglArm64Debug`, writes
-`OsmAnd/build/outputs/apk/speedPedelecOpenglArm64/debug/OsmAnd-speedPedelec-opengl-arm64-debug.apk`.
-It installs as a separate app, "OsmAnd Speed Pedelec" (`be.spedelec.osmand.app`), next to OsmAnd, and is
+The default task, `assembleOsmPedelecOpenglArm64Debug`, writes
+`OsmAnd/build/outputs/apk/osmPedelecOpenglArm64/debug/OsmAnd-osmPedelec-opengl-arm64-debug.apk`.
+It installs as a separate app, "OsmPedelec" (`be.osmpedelec.app`), next to OsmAnd, and is
 signed with `keystores/debug.keystore`, so newer builds install over older ones:
 
 ```sh
-adb install -r OsmAnd/build/outputs/apk/speedPedelecOpenglArm64/debug/*.apk
+adb install -r OsmAnd/build/outputs/apk/osmPedelecOpenglArm64/debug/*.apk
 ```
 
 To use the maps of the OsmAnd app instead of downloading them again: in OsmAnd, set *Settings > OsmAnd
-settings > Data storage folder* to *Multiuser storage*; in OsmAnd Speed Pedelec, open *Settings > OsmAnd
+settings > Data storage folder* to *Multiuser storage*; in OsmPedelec, open *Settings > OsmAnd
 settings > Maps from OsmAnd* and allow *Install unknown apps*. Android only lets apps with that permission
 read another app's `Android/obb` folder; the app never installs anything. It reads OsmAnd's maps and does not
-change them; maps downloaded in OsmAnd Speed Pedelec are stored in its own folder and take precedence.
+change them; maps downloaded in OsmPedelec are stored in its own folder and take precedence.
 
 `assembleNightlyFreeOpenglArm64Debug` builds the same code as "OsmAnd Nightly" (`net.osmand.dev`), without
 access to the OsmAnd maps.
 
 Other tasks and Gradle arguments go on the command line, for example
-`build-container/build-apk.sh assembleSpeedPedelecOpenglFatDebug` for all ABIs, or
+`build-container/build-apk.sh assembleOsmPedelecOpenglFatDebug` for all ABIs, or
 `build-container/build-apk.sh :OsmAnd-java:test` to run the Java tests. `build-container/build-apk.sh shell`
 opens a shell in the build container.
 
@@ -84,10 +84,10 @@ which
 
 1. takes the next release number for the OsmAnd version in `OsmAnd/build.gradle`: OsmAnd 5.5.0
    (versionCode 5550) gives `5.5.0-sp1`, `5.5.0-sp2`, … with versionCode 555001, 555002, …;
-2. builds `assembleSpeedPedelecOpenglArm64Release` in the podman builder, signed with `apk-signing.p12`;
+2. builds `assembleOsmPedelecOpenglArm64Release` in the podman builder, signed with `apk-signing.p12`;
 3. copies the APK and the release notes (`NOTES_FILE`, or the subjects of the commits since the last release
    that are not on `origin/master`; the first release has none unless `NOTES_FILE` is set) into the
-   repository, writes the app's metadata from `fdroid/metadata/be.spedelec.osmand.app.yml` in this folder
+   repository, writes the app's metadata from `fdroid/metadata/be.osmpedelec.app.yml` in this folder
    plus an entry per release, and runs `fdroid update` in a container, which signs the new index;
 4. tags the commit `v5.5.0-spN` (locally; push it yourself);
 5. uploads the repository: new and changed files first, the index last, deletes files that `fdroid update`
@@ -98,7 +98,7 @@ If the upload fails, `build-container/release.sh publish` uploads again without 
 `build-container/release.sh fingerprint` prints the repository fingerprint and the link to add the repository
 with it. `build-container/release.sh shell` opens a shell with fdroidserver in the repository, e.g. to
 remove a release: delete its APK from `repo/` and its line from `releases`, remove its entry under `Builds`
-in `metadata/be.spedelec.osmand.app.yml` (and fix `CurrentVersion`), run `fdroid update`, then `publish`.
+in `metadata/be.osmpedelec.app.yml` (and fix `CurrentVersion`), run `fdroid update`, then `publish`.
 
 Release builds are signed with a different key than the debug builds, so switching from a debug build to a
 release means uninstalling the debug build first.

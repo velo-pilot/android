@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon foreground: speed pedelec (e-bike) on a 108x108 canvas.
+     Artwork sits inside the 66dp safe-zone circle centred on (54,54). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Frame and wheels -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M25,64a11,11 0 1,0 22,0a11,11 0 1,0 -22,0
+            M61,64a11,11 0 1,0 22,0a11,11 0 1,0 -22,0
+            M36,64L50,64
+            M50,64L44,44
+            M36,64L44,44
+            M44,44L66,44
+            M50,64L66,52
+            M66,44L66,52
+            M66,52L72,64
+            M66,44L66,36
+            M61,36L70,36
+            M39,41.5L49,41.5
+            M44,44L44,41.5" />
+
+    <!-- Battery on the down tube (electric assist) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFC93C"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M54,61L62,55" />
+
+    <!-- Speed chevrons (speed pedelec, up to 45 km/h) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFC93C"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M26,41L30,44.5L26,48
+            M32,41L36,44.5L32,48" />
+</vector>

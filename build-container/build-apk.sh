@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Builds the OsmAnd APK in a podman container, without a local JDK or Android SDK.
 #
-#   build-container/build-apk.sh                                      # speedPedelec, OpenGL, arm64, debug
-#   build-container/build-apk.sh assembleSpeedPedelecOpenglFatDebug   # any Gradle task, extra args follow
-#   build-container/build-apk.sh shell                               # shell in the build container
+#   build-container/build-apk.sh                                    # osmPedelec, OpenGL, arm64, debug
+#   build-container/build-apk.sh assembleOsmPedelecOpenglFatDebug   # any Gradle task, extra args follow
+#   build-container/build-apk.sh shell                              # shell in the build container
 #
 # Environment:
 #   RESOURCES_DIR     OsmAnd-resources checkout; cloned if missing (default: next to this repository,
@@ -23,7 +23,7 @@ REPO_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 RESOURCES_DIR=${RESOURCES_DIR:-$(dirname "$REPO_DIR")/resources}
 CACHE_DIR=${CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/osmand-builder}
 GRADLE_XMX=${GRADLE_XMX:-6g}
-TASK=${1:-assembleSpeedPedelecOpenglArm64Debug}
+TASK=${1:-assembleOsmPedelecOpenglArm64Debug}
 shift || true
 
 # Android SDK packages the build asks for

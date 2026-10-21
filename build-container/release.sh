@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Releases OsmAnd Speed Pedelec to the F-Droid repository on cdn.osmpedelec.be.
+# Releases OsmPedelec to the F-Droid repository on cdn.osmpedelec.be.
 #
 #   build-container/release.sh init       # once: release key, F-Droid repository and release.env
 #   build-container/release.sh            # build the next release, add it to the repository and publish
@@ -13,7 +13,7 @@
 #   RELEASE_HOME   keys, release.env and the F-Droid repository (default ~/.local/share/osmpedelec-release)
 #   CDN_URL        public URL of the Bunny pull zone (default https://cdn.osmpedelec.be)
 #   REMOTE_PREFIX  folder of the repository in the storage zone (default fdroid)
-#   TASK           Gradle task that builds the APK (default assembleSpeedPedelecOpenglArm64Release)
+#   TASK           Gradle task that builds the APK (default assembleOsmPedelecOpenglArm64Release)
 #   NOTES_FILE     release notes, up to 500 characters (default: subjects of the commits since the last
 #                  release that are not on origin/master)
 #   DRY_RUN        1 = show what publish would upload and delete, without changing the storage zone
@@ -28,10 +28,10 @@ FDROID_DIR=$RELEASE_HOME/fdroid
 ENV_FILE=$RELEASE_HOME/release.env
 export CDN_URL=${CDN_URL:-https://cdn.osmpedelec.be}
 REMOTE_PREFIX=${REMOTE_PREFIX:-fdroid}
-TASK=${TASK:-assembleSpeedPedelecOpenglArm64Release}
+TASK=${TASK:-assembleOsmPedelecOpenglArm64Release}
 FDROID_IMAGE=${FDROID_IMAGE:-localhost/osmpedelec-fdroid}
-APP_ID=be.spedelec.osmand.app
-KEY_ALIAS=speedpedelec
+APP_ID=be.osmpedelec.app
+KEY_ALIAS=osmpedelec
 COMMAND=${1:-release}
 
 label=""
@@ -83,7 +83,7 @@ cmd_init() {
 	echo ">> Creating the APK signing key"
 	OSMAND_APK_PASSWORD=$apk_password fdroid_container -v "$RELEASE_HOME:/out$label" -e OSMAND_APK_PASSWORD \
 		"$FDROID_IMAGE" keytool -genkeypair -keystore /out/apk-signing.p12 -storetype PKCS12 \
-		-alias "$KEY_ALIAS" -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=OsmAnd Speed Pedelec" \
+		-alias "$KEY_ALIAS" -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=OsmPedelec" \
 		-storepass:env OSMAND_APK_PASSWORD -keypass:env OSMAND_APK_PASSWORD
 	chmod 600 "$RELEASE_HOME/apk-signing.p12"
 
@@ -92,13 +92,13 @@ cmd_init() {
 	cat >> "$FDROID_DIR/config.yml" <<-EOF
 
 	repo_url: $CDN_URL/$REMOTE_PREFIX/repo
-	repo_name: OsmAnd Speed Pedelec
+	repo_name: OsmPedelec
 	repo_description: >-
 	  OsmAnd with routing for 45 km/h speed pedelecs, built from the speed-pedelec branch of OsmAnd.
 	archive_older: 3
 	archive_url: $CDN_URL/$REMOTE_PREFIX/archive
-	archive_name: OsmAnd Speed Pedelec archive
-	archive_description: Older releases of OsmAnd Speed Pedelec.
+	archive_name: OsmPedelec archive
+	archive_description: Older releases of OsmPedelec.
 	EOF
 	chmod 600 "$FDROID_DIR/config.yml"
 
@@ -180,8 +180,8 @@ cmd_release() {
 	mkdir -p "$FDROID_DIR/metadata/$APP_ID/en-US/changelogs"
 	# fdroid update reads the repository icon from the repository folder and the app icon from the metadata:
 	# R8 shortens the resource paths of the release APK, so fdroidserver cannot find the icon in it
-	cp OsmAnd/res/mipmap-xxxhdpi/icon_speed_pedelec.png "$FDROID_DIR/icon.png"
-	cp OsmAnd/res/mipmap-xxxhdpi/icon_speed_pedelec.png "$FDROID_DIR/metadata/$APP_ID/en-US/icon.png"
+	cp "$SCRIPT_DIR/fdroid/icon.png" "$FDROID_DIR/icon.png"
+	cp "$SCRIPT_DIR/fdroid/icon.png" "$FDROID_DIR/metadata/$APP_ID/en-US/icon.png"
 	local notes=$FDROID_DIR/metadata/$APP_ID/en-US/changelogs/$code.txt
 	if [ -n "${NOTES_FILE:-}" ]; then
 		cp "$NOTES_FILE" "$notes"
@@ -200,7 +200,7 @@ cmd_release() {
 	cp "$apk" "$FDROID_DIR/repo/${APP_ID}_$code.apk"
 	fdroid_container "$FDROID_IMAGE" fdroid update
 
-	git tag -a "v$version" -m "OsmAnd Speed Pedelec $version (versionCode $code)"
+	git tag -a "v$version" -m "OsmPedelec $version (versionCode $code)"
 	echo ">> Tagged v$version"
 	cmd_publish
 }
