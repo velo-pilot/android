@@ -13,6 +13,10 @@
 #   GRADLE_XMX        Gradle daemon heap (default 6g)
 #   RUN_TESTS         1 = also run the OsmAnd-java tests that an APK build skips by default
 #   REBUILD_IMAGE     1 = rebuild the container image
+#   APK_NUMBER_VERSION, APK_VERSION, APP_EDITION
+#                     versionCode, versionName and edition of the APK (see OsmAnd/build.gradle)
+#   OSMAND_APK_KEYSTORE, OSMAND_APK_KEY_ALIAS, OSMAND_APK_PASSWORD
+#                     release signing key; the keystore's folder is mounted read-only
 set -euo pipefail
 
 REPO_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
@@ -60,6 +64,16 @@ run=(podman run --rm --init
 	-w /work/OsmAnd)
 if [ -t 0 ] && [ -t 1 ]; then
 	run+=(-it)
+fi
+# -e NAME takes the value from this environment, so the password stays off the command line
+for var in APK_NUMBER_VERSION APK_VERSION APP_EDITION OSMAND_APK_KEY_ALIAS OSMAND_APK_PASSWORD; do
+	if [ -n "${!var:-}" ]; then
+		run+=(-e "$var")
+	fi
+done
+if [ -n "${OSMAND_APK_KEYSTORE:-}" ]; then
+	keystore=$(realpath "$OSMAND_APK_KEYSTORE")
+	run+=(-v "$(dirname "$keystore"):/keys:ro${label:+,z}" -e "OSMAND_APK_KEYSTORE=/keys/$(basename "$keystore")")
 fi
 
 if [ "$TASK" = shell ]; then

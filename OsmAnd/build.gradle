@@ -12,6 +12,7 @@ apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 // APK_VERSION_SUFFIX - build number like #99999Z, appended (for dev builds) to Manifest's versionName as X.X.X#99999Z
 //                      Z means flavor: M=-master, D=-main-default, Des=-design, MQA=-main-qt-arm, MQDA=-main-qt-default-arm, S=-sherpafy
 // APP_EDITION        - date stamp of builds
+// OSMAND_APK_KEYSTORE, OSMAND_APK_KEY_ALIAS, OSMAND_APK_PASSWORD - release signing key
 
 // 1. To be done Filter fonts
 // <unzip src="OsmAndCore_android.aar" dest=".">
@@ -32,9 +33,10 @@ android {
 		}
 
 		publishing {
-			storeFile file("/var/lib/jenkins/osmand_key")
+			// OSMAND_APK_KEYSTORE and OSMAND_APK_KEY_ALIAS select another release key, see build-container/release.sh
+			storeFile file(System.getenv("OSMAND_APK_KEYSTORE") ?: "/var/lib/jenkins/osmand_key")
 			storePassword System.getenv("OSMAND_APK_PASSWORD")
-			keyAlias "osmand"
+			keyAlias System.getenv("OSMAND_APK_KEY_ALIAS") ?: "osmand"
 			keyPassword System.getenv("OSMAND_APK_PASSWORD")
 		}
 	}

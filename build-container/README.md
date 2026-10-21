@@ -49,3 +49,56 @@ current OsmAnd-resources (47 on `master` at 5e131f4eb5), so APK builds skip `:Os
 The OpenGL flavours take the native core from the prebuilt `OsmAndCore_android` snapshot on
 builder.osmand.net. The legacy native library (`libosmand.so`) needs the Android NDK and the OsmAnd-core-legacy
 sources, which this image does not include; without it the app uses its Java router.
+
+## Releases on cdn.osmpedelec.be
+
+`build-container/release.sh` builds a signed release APK and publishes it in an F-Droid repository at
+<https://cdn.osmpedelec.be/fdroid/repo>, a Bunny CDN pull zone in front of a Bunny Storage zone. Users add that
+repository (with its fingerprint) to F-Droid, Droid-ify, Neo Store or Obtainium and get updates from there.
+
+Once, set up the keys and the repository:
+
+```sh
+build-container/release.sh init
+```
+
+This creates `~/.local/share/osmpedelec-release` (`RELEASE_HOME`) with
+
+- `apk-signing.p12`, the key that signs the APK. Android only installs an update signed with the same key.
+- `fdroid/`, the F-Droid repository: `config.yml`, `keystore.p12` (signs the index; its fingerprint is
+  what users check), `releases` (versionCode and versionName of every release), `metadata/`, `repo/` and
+  `archive/`. This is the source of truth; the storage zone is a copy.
+- `release.env`, the passwords and the Bunny credentials.
+
+Back that folder up. Then fill in `BUNNY_STORAGE_ZONE`, `BUNNY_STORAGE_PASSWORD` and `BUNNY_STORAGE_HOST`
+(Storage > zone > FTP & API Access in the Bunny dashboard) and, to purge the cached index after an upload,
+`BUNNY_API_KEY` (Account settings > API key) in `release.env`.
+
+For each release, commit everything and run
+
+```sh
+build-container/release.sh
+```
+
+which
+
+1. takes the next release number for the OsmAnd version in `OsmAnd/build.gradle`: OsmAnd 5.5.0
+   (versionCode 5550) gives `5.5.0-sp1`, `5.5.0-sp2`, … with versionCode 555001, 555002, …;
+2. builds `assembleSpeedPedelecOpenglArm64Release` in the podman builder, signed with `apk-signing.p12`;
+3. copies the APK and the release notes (`NOTES_FILE`, or the subjects of the commits since the last release
+   that are not on `origin/master`; the first release has none unless `NOTES_FILE` is set) into the
+   repository, writes the app's metadata from `fdroid/metadata/be.spedelec.osmand.app.yml` in this folder
+   plus an entry per release, and runs `fdroid update` in a container, which signs the new index;
+4. tags the commit `v5.5.0-spN` (locally; push it yourself);
+5. uploads the repository: new and changed files first, the index last, deletes files that `fdroid update`
+   moved to the archive and purges `cdn.osmpedelec.be/fdroid/*` from the CDN cache.
+
+If the upload fails, `build-container/release.sh publish` uploads again without building;
+`DRY_RUN=1 build-container/release.sh publish` only lists what it would change.
+`build-container/release.sh fingerprint` prints the repository fingerprint and the link to add the repository
+with it. `build-container/release.sh shell` opens a shell with fdroidserver in the repository, e.g. to
+remove a release: delete its APK from `repo/` and its line from `releases`, remove its entry under `Builds`
+in `metadata/be.spedelec.osmand.app.yml` (and fix `CurrentVersion`), run `fdroid update`, then `publish`.
+
+Release builds are signed with a different key than the debug builds, so switching from a debug build to a
+release means uninstalling the debug build first.
