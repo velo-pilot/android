@@ -290,3 +290,41 @@ afterEvaluate {
 		dependencies.add("opengldebugImplementation", "net.osmand:OsmAndCore_android:${remoteAarSnapshot}@aar")
 	}
 }
+
+// The OpenGL renderer reads shields and icons only from the resource bundle of OsmAndCore, not from
+// res/drawable. Add the app's own ones (core-resources/) to the merged bundle: each file is stored
+// qCompress-ed as <path>.qz and listed in OsmAndCore_ResourcesBundle.index.
+def extraCoreResources = file("core-resources")
+tasks.withType(com.android.build.gradle.tasks.MergeSourceSetFolders).configureEach { task ->
+	if (task.name ==~ /merge\w*Opengl\w*Assets/) {
+		task.inputs.dir(extraCoreResources).withPropertyName("extraCoreResources")
+		task.doLast {
+			def outDir = task.outputDir.get().asFile
+			def index = new File(outDir, "OsmAndCore_ResourcesBundle.index")
+			if (!index.exists()) {
+				throw new GradleException("OsmAndCore resource bundle index not found in ${outDir}")
+			}
+			def entries = index.readLines() as Set
+			def added = []
+			extraCoreResources.eachFileRecurse(groovy.io.FileType.FILES) { f ->
+				def name = extraCoreResources.toPath().relativize(f.toPath()).toString().replace(File.separator, "/")
+				def data = f.bytes
+				def target = new File(outDir, "OsmAndCore_ResourcesBundle/${name}.qz")
+				target.parentFile.mkdirs()
+				target.withOutputStream { out ->
+					out.write(java.nio.ByteBuffer.allocate(4).putInt(data.length).array())
+					def deflater = new java.util.zip.DeflaterOutputStream(out)
+					deflater.write(data)
+					deflater.finish()
+				}
+				if (!entries.contains(name)) {
+					added << name
+				}
+			}
+			if (added) {
+				def text = index.text
+				index.append((text.isEmpty() || text.endsWith("\n") ? "" : "\n") + added.join("\n"))
+			}
+		}
+	}
+}
