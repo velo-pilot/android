@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<style name="OsmandMaterialLightTheme" parent="Theme.Material3.Light">
+	<style name="OsmandMaterialLightTheme" parent="OsmandBaseMaterialLightTheme">
 
 		<item name="colorPrimary">@color/primary_light</item>
 		<item name="colorOnPrimary">@color/on_primary_light</item>

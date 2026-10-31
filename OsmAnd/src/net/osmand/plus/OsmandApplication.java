@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -26,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.compose.ui.AndroidComposeUiFlags;
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -114,6 +116,7 @@ import net.osmand.plus.track.helpers.GpxDisplayHelper;
 import net.osmand.plus.track.helpers.GpxSelectionHelper;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.FileUtils;
+import net.osmand.plus.utils.FontCache;
 import net.osmand.plus.utils.UiUtilities;
 import net.osmand.plus.views.OsmandMap;
 import net.osmand.plus.views.PointImageUtils;
@@ -249,6 +252,7 @@ public class OsmandApplication extends MultiDexApplication {
 		enableStrictMode();
 		applyComposeWorkarounds();
 		super.onCreate();
+		setupDefaultFont();
 
 		LifecycleObserver appLifecycleObserver = new DefaultLifecycleObserver() {
 			@Override
@@ -329,6 +333,23 @@ public class OsmandApplication extends MultiDexApplication {
 	 */
 	private void applyComposeWorkarounds() {
 		AndroidComposeUiFlags.isViewBasedSemanticsHandlerEnabled = false;
+	}
+
+	/**
+	 * Lets FontCache use the font of the app themes, which a flavour can set in OsmandBaseLightTheme
+	 * (res/values/osmand_base_styles.xml), where code asks for the default font.
+	 */
+	private void setupDefaultFont() {
+		TypedArray attributes = obtainStyledAttributes(R.style.OsmandLightTheme, new int[] {android.R.attr.fontFamily});
+		int fontId = attributes.getResourceId(0, 0);
+		attributes.recycle();
+		if (fontId != 0) {
+			try {
+				FontCache.setDefaultFont(ResourcesCompat.getFont(this, fontId));
+			} catch (Resources.NotFoundException e) {
+				LOG.error("Font of the app theme not found", e);
+			}
+		}
 	}
 
 	public boolean isPlusVersionInApp() {

@@ -87,6 +87,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 
 	private DownloadIndexesThread downloadThread;
 	private DownloadValidationManager validationManager;
+	private SharedMapsPrompt sharedMapsPrompt;
 
 	private View view;
 
@@ -125,6 +126,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 		super.onCreate(savedInstanceState);
 		downloadThread = app.getDownloadThread();
 		validationManager = new DownloadValidationManager(app);
+		sharedMapsPrompt = new SharedMapsPrompt(app);
 		if (wizardType == null) {
 			wizardType = DEFAULT_WIZARD_TYPE;
 		}
@@ -209,7 +211,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 				AndroidUiHelper.updateVisibility(wizardProgressBarCircle, false);
 				AndroidUiHelper.updateVisibility(wizardIcon, true);
 				wizardIcon.setImageDrawable(ContextCompat.getDrawable(app, R.drawable.ic_map));
-				wizardIcon.getDrawable().setTint(app.getColor(R.color.icon_color_active_light));
+				wizardIcon.getDrawable().setTint(ColorUtilities.getActiveIconColor(app, deviceNightMode));
 
 				if (mapIndexItem != null) {
 					wizardTitle.setText(mapIndexItem.getVisibleName(getContext(), app.getRegions(), false));
@@ -218,10 +220,10 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 					wizardButton.setTitle(getString(R.string.shared_string_download) + " " + mapIndexItem.getSizeDescription(getContext()));
 
 					wizardButton.setOnClickListener(view -> {
-						boolean spaceEnoughForLocal = validationManager.isSpaceEnoughForDownload(getActivity(), true, mapIndexItem);
-						if (spaceEnoughForLocal) {
-							mapDownloadCancelled = false;
-							showMapDownloadWizard(true);
+						if (sharedMapsPrompt.isNeeded()) {
+							sharedMapsPrompt.show(activity, deviceNightMode, this::downloadFoundMap);
+						} else {
+							downloadFoundMap();
 						}
 					});
 				}
@@ -231,7 +233,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 				AndroidUiHelper.updateVisibility(wizardProgressBarCircle, false);
 				AndroidUiHelper.updateVisibility(wizardIcon, true);
 				wizardIcon.setImageDrawable(ContextCompat.getDrawable(app, R.drawable.ic_map));
-				wizardIcon.getDrawable().setTint(app.getColor(R.color.icon_color_active_light));
+				wizardIcon.getDrawable().setTint(ColorUtilities.getActiveIconColor(app, deviceNightMode));
 
 				if (mapIndexItem != null) {
 					AndroidUiHelper.updateVisibility(wizardProgressBar, true);
@@ -250,7 +252,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 				AndroidUiHelper.updateVisibility(wizardProgressBar, false);
 				AndroidUiHelper.updateVisibility(wizardIcon, true);
 				wizardIcon.setImageDrawable(ContextCompat.getDrawable(app, R.drawable.ic_map));
-				wizardIcon.getDrawable().setTint(app.getColor(R.color.icon_color_active_light));
+				wizardIcon.getDrawable().setTint(ColorUtilities.getActiveIconColor(app, deviceNightMode));
 				wizardButton.setButtonType(DialogButtonType.PRIMARY);
 				wizardButton.setTitleId(R.string.go_to_map);
 
@@ -432,6 +434,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 		MapActivity activity = getMapActivity();
 		if (activity != null) {
 			activity.disableDrawer();
+			sharedMapsPrompt.onResume(activity);
 		}
 	}
 
@@ -499,6 +502,14 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 	public void downloadHasFinished() {
 		if (mapIndexItem != null && mapIndexItem.isDownloaded()) {
 			showMapDownloadedWizard(true);
+		}
+	}
+
+	private void downloadFoundMap() {
+		boolean spaceEnoughForLocal = validationManager.isSpaceEnoughForDownload(getActivity(), true, mapIndexItem);
+		if (spaceEnoughForLocal) {
+			mapDownloadCancelled = false;
+			showMapDownloadWizard(true);
 		}
 	}
 
@@ -677,7 +688,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 	private void setupClickableToSText(SpannableString text, String part, int urlId) {
 		int startInd = text.toString().indexOf(part);
 		int endInd = startInd + part.length();
-		int color = ColorUtilities.getColor(app, R.color.active_color_primary_light);
+		int color = ColorUtilities.getActiveColor(app, deviceNightMode);
 		ForegroundColorSpan colorSpan = new ForegroundColorSpan(color);
 		Typeface typeface = FontCache.getMediumFont();
 		CustomTypefaceSpan typefaceSpan = new CustomTypefaceSpan(typeface);

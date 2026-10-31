@@ -6,8 +6,15 @@
          used without downloading them again (SharedMapsHelper). This app does not install packages. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- OsmAnd apps whose maps can be used (SharedMapsHelper.getInstalledOsmAndPackage) -->
+    <queries>
+        <package android:name="net.osmand.plus" />
+        <package android:name="net.osmand" />
+        <package android:name="net.osmand.dev" />
+    </queries>
+
     <application
-        android:icon="@mipmap/icon_osmpedelec"
+        android:icon="@mipmap/icon_velopilot"
         tools:replace="android:icon">
 
         <provider

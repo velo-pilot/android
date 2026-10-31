@@ -1,10 +1,14 @@
 package net.osmand.plus.resources
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.system.ErrnoException
+import android.system.Os
 import net.osmand.IndexConstants
+import net.osmand.PlatformUtil
 import net.osmand.plus.BuildConfig
 import net.osmand.plus.OsmandApplication
 import java.io.File
@@ -20,7 +24,9 @@ import java.io.File
  */
 object SharedMapsHelper {
 
+	private val LOG = PlatformUtil.getLog(SharedMapsHelper::class.java)
 	private val OSMAND_PACKAGES = listOf("net.osmand.plus", "net.osmand", "net.osmand.dev")
+	private const val LINKS_DIR = "shared_maps"
 
 	@JvmStatic
 	fun isSupported(): Boolean = BuildConfig.SHARED_OSMAND_MAPS
@@ -30,6 +36,22 @@ object SharedMapsHelper {
 	fun needsAccess(app: OsmandApplication): Boolean {
 		return isSupported() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 				&& !app.packageManager.canRequestPackageInstalls()
+	}
+
+	/** Package of an installed OsmAnd app whose maps this app could use, null if there is none. */
+	@JvmStatic
+	fun getInstalledOsmAndPackage(app: OsmandApplication): String? {
+		if (!isSupported()) {
+			return null
+		}
+		return OSMAND_PACKAGES.filter { it != app.packageName }.firstOrNull { packageName ->
+			try {
+				app.packageManager.getPackageInfo(packageName, 0)
+				true
+			} catch (e: PackageManager.NameNotFoundException) {
+				false
+			}
+		}
 	}
 
 	@JvmStatic
@@ -48,6 +70,12 @@ object SharedMapsHelper {
 			.filter { it != app.packageName }
 			.map { File(obbRoot, it) }
 			.filter { it.isDirectory && it.canRead() }
+	}
+
+	/** True when the shared data folders have maps that this app does not have itself. */
+	@JvmStatic
+	fun hasMaps(app: OsmandApplication): Boolean {
+		return collectMaps(app, "").isNotEmpty() || collectMaps(app, IndexConstants.ROADS_INDEX_DIR).isNotEmpty()
 	}
 
 	/**
@@ -71,5 +99,29 @@ object SharedMapsHelper {
 			}
 		}
 		return result
+	}
+
+	/**
+	 * A folder of this app with links to the maps of [collectMaps] in [subdirs], for OsmAndCore, or null when there
+	 * are none. Its ObfsCollection must not get single files (addFile): it creates its index cache only when the
+	 * first of its sources is a folder, and their order is random, so a file source crashes it now and then.
+	 */
+	@JvmStatic
+	fun linkMaps(app: OsmandApplication, name: String, vararg subdirs: String): File? {
+		val dir = File(File(app.noBackupFilesDir, LINKS_DIR), name)
+		// Deleting a link leaves the map it points to alone
+		dir.listFiles()?.forEach { it.delete() }
+		val maps = subdirs.flatMap { collectMaps(app, it) }
+		if (maps.isEmpty() || !(dir.isDirectory || dir.mkdirs())) {
+			return null
+		}
+		for (map in maps) {
+			try {
+				Os.symlink(map.absolutePath, File(dir, map.name).absolutePath)
+			} catch (e: ErrnoException) {
+				LOG.error("Could not link shared map " + map.absolutePath, e)
+			}
+		}
+		return dir
 	}
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- All app themes derive from these (res/values/osmand_base_styles.xml): VeloPilot uses the font of its logo -->
+    <style name="OsmandBaseLightTheme" parent="Theme.MaterialComponents.Light">
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+    </style>
+    <style name="OsmandBaseDarkTheme" parent="Theme.MaterialComponents">
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+    </style>
+    <style name="OsmandBaseMaterialLightTheme" parent="Theme.Material3.Light">
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+    </style>
+    <style name="OsmandBaseMaterialDarkTheme" parent="Theme.Material3.Dark">
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+    </style>
+</resources>

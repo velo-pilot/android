@@ -11,9 +11,16 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="shared_osmand_maps_prompt_title">Use your OsmAnd maps?</string>
+	<string name="shared_osmand_maps_prompt_no_access">OsmAnd is on this phone, so %1$s can use its maps instead of downloading them again.\n\nTap Allow access, turn on the switch and come back. %1$s only reads the maps; it never installs apps.</string>
+	<string name="shared_osmand_maps_prompt_move_title">Move your OsmAnd maps</string>
+	<string name="shared_osmand_maps_prompt_not_found">%1$s can\'t see the maps of OsmAnd yet. Tap Open OsmAnd, then:\n\n1. Go to Menu › Settings › OsmAnd settings › Main storage.\n2. Choose Multiuser storage, then Move to the new destination.\n3. When the maps are moved, come back to %1$s.</string>
+	<string name="shared_osmand_maps_restart">Restart %1$s to load the maps of OsmAnd.</string>
+	<string name="shared_osmand_maps_allow_access">Allow access</string>
+	<string name="shared_osmand_maps_open_osmand">Open OsmAnd</string>
 	<string name="shared_osmand_maps">Maps from OsmAnd</string>
-	<string name="shared_osmand_maps_no_access">Use the maps of the OsmAnd app instead of downloading them again. Tap to allow access (Install unknown apps), then set the data storage folder in OsmAnd to Multiuser storage.</string>
-	<string name="shared_osmand_maps_not_found">No OsmAnd maps found. In OsmAnd, set the data storage folder to Multiuser storage and choose &quot;Move to the new destination&quot;, so that the maps are moved there.</string>
+	<string name="shared_osmand_maps_no_access">Use the maps of the OsmAnd app instead of downloading them again. Tap to allow access, then in OsmAnd set Settings › OsmAnd settings › Main storage to Multiuser storage.</string>
+	<string name="shared_osmand_maps_not_found">No OsmAnd maps found. In OsmAnd, go to Settings › OsmAnd settings › Main storage, choose Multiuser storage, then Move to the new destination.</string>
 	<string name="shared_osmand_maps_found">%1$d maps in use from %2$s</string>
 	<string name="speed_pedelec_render_descr">Highlights cycle highways, cycle paths and railways, which often have a cycle path alongside. Motorways and trunk roads are muted.</string>
 	<string name="rendering_attr_hideCycleHighways_name">Hide cycle highways</string>

@@ -2,15 +2,20 @@
 """Mirrors local folders of the F-Droid repository to a Bunny Storage zone and purges the CDN cache.
 
     bunny_sync.py [--dry-run] LOCAL_ROOT REMOTE_PREFIX FOLDER...
+    bunny_sync.py --pull LOCAL_ROOT REMOTE_PREFIX FOLDER...
 
 Uploads LOCAL_ROOT/FOLDER/** to REMOTE_PREFIX/FOLDER/** in the storage zone, skipping files whose SHA-256
 already matches, and deletes remote files that no longer exist locally. APKs and icons go first and the
 index files last, so a client never reads an index that points at a file that is not there yet.
 
+--pull downloads the APKs of REMOTE_PREFIX/FOLDER/** to LOCAL_ROOT/FOLDER/** instead: the published APKs
+that fdroid update needs to write the new index.
+
 Environment:
     BUNNY_STORAGE_ZONE      storage zone name
     BUNNY_STORAGE_PASSWORD  storage zone password (FTP & API access)
-    BUNNY_STORAGE_HOST      storage endpoint of the zone's main region (default storage.bunnycdn.com)
+    BUNNY_STORAGE_HOST      storage endpoint of the zone's main region (default storage.bunnycdn.com); a URL
+                            like http://localhost:8080 also works, for tests
     BUNNY_API_KEY           account API key; when set, purges CDN_URL/REMOTE_PREFIX/* after a change
     CDN_URL                 public URL of the pull zone, e.g. https://cdn.osmpedelec.be
 """
@@ -36,7 +41,8 @@ HOST = env("BUNNY_STORAGE_HOST", "storage.bunnycdn.com")
 
 
 def storage_url(path):
-    return f"https://{HOST}/{urllib.parse.quote(ZONE)}/{urllib.parse.quote(path)}"
+    base = HOST if "://" in HOST else f"https://{HOST}"
+    return f"{base}/{urllib.parse.quote(ZONE)}/{urllib.parse.quote(path)}"
 
 
 def request(method, url, key, data=None, headers=None):
@@ -76,6 +82,16 @@ def sha256(path):
     return digest.hexdigest()
 
 
+def download(path, target, checksum):
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    req = urllib.request.Request(storage_url(path), headers={"AccessKey": PASSWORD})
+    with urllib.request.urlopen(req, timeout=600) as response, open(target, "wb") as f:
+        for block in iter(lambda: response.read(1 << 20), b""):
+            f.write(block)
+    if checksum and sha256(target) != checksum:
+        sys.exit(f"{path}: checksum mismatch after download")
+
+
 def upload_order(path):
     name = os.path.basename(path)
     if name.startswith("entry."):
@@ -88,10 +104,19 @@ def upload_order(path):
 def main():
     args = sys.argv[1:]
     dry_run = "--dry-run" in args
-    args = [a for a in args if a != "--dry-run"]
+    pull = "--pull" in args
+    args = [a for a in args if a not in ("--dry-run", "--pull")]
     if len(args) < 3:
         sys.exit(__doc__)
     local_root, prefix, folders = args[0], args[1].strip("/"), args[2:]
+
+    if pull:
+        for folder in folders:
+            for path, checksum in sorted(list_remote(f"{prefix}/{folder}").items()):
+                if path.endswith(".apk"):
+                    print(f"download {path}")
+                    download(path, os.path.join(local_root, os.path.relpath(path, prefix)), checksum)
+        return
 
     local = {}
     for folder in folders:

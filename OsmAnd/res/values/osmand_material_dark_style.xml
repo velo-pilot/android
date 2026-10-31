@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<style name="OsmandMaterialDarkTheme" parent="Theme.Material3.Dark">
+	<style name="OsmandMaterialDarkTheme" parent="OsmandBaseMaterialDarkTheme">
 
 		<item name="colorPrimary">@color/primary_dark</item>
 		<item name="colorOnPrimary">@color/on_primary_dark</item>

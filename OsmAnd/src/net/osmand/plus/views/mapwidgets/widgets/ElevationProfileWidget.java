@@ -44,6 +44,7 @@ import net.osmand.plus.settings.backend.preferences.CommonPreference;
 import net.osmand.plus.track.helpers.GpxDisplayItem;
 import net.osmand.plus.track.helpers.GpxUiHelper;
 import net.osmand.plus.utils.ColorUtilities;
+import net.osmand.plus.utils.FontCache;
 import net.osmand.plus.utils.OsmAndFormatter;
 import net.osmand.plus.utils.UiUtilities;
 import net.osmand.plus.views.layers.base.OsmandMapLayer.DrawSettings;
@@ -176,7 +177,7 @@ public class ElevationProfileWidget extends MapWidget {
 		title.setText(textId);
 
 		TextView text = blockView.findViewById(R.id.widget_text);
-		text.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+		text.setTypeface(FontCache.getDefaultFont(), Typeface.BOLD);
 
 		ImageView icon = blockView.findViewById(R.id.image);
 		icon.setImageResource(iconId);

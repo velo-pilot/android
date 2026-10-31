@@ -21,6 +21,24 @@ public class FontCache {
 
 	private static final Map<Pair<Typeface, Integer>, Typeface> FONT_MAP = new ConcurrentHashMap<>();
 
+	@Nullable
+	private static Typeface defaultFont;
+
+	/**
+	 * Font used instead of the system font when no original typeface is given, see
+	 * OsmandApplication#setupDefaultFont
+	 */
+	public static void setDefaultFont(@Nullable Typeface font) {
+		defaultFont = font;
+		FONT_MAP.clear();
+	}
+
+	/** The app font, or the system font when the app themes set none. */
+	@NonNull
+	public static Typeface getDefaultFont() {
+		return defaultFont != null ? defaultFont : Typeface.DEFAULT;
+	}
+
 	@NonNull
 	public static Typeface getMediumFont() {
 		return getFont(null, FONT_WEIGHT_MEDIUM);
@@ -43,6 +61,9 @@ public class FontCache {
 
 	@NonNull
 	public static Typeface getFont(@Nullable Typeface original, int weight) {
+		if (original == null) {
+			original = defaultFont;
+		}
 		Pair<Typeface, Integer> pair = Pair.create(original, weight);
 
 		Typeface typeface = FONT_MAP.get(pair);

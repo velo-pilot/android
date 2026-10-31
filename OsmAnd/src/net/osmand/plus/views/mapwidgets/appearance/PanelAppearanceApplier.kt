@@ -11,6 +11,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.ViewCompat
 import androidx.core.widget.ImageViewCompat
 import net.osmand.plus.helpers.AndroidUiHelper
+import net.osmand.plus.utils.FontCache
 import net.osmand.plus.views.mapwidgets.OutlinedTextContainer
 
 object PanelAppearanceApplier {
@@ -126,7 +127,7 @@ object PanelAppearanceApplier {
 		if (text != null) {
 			val typefaceStyle = if (appearance.boldText) Typeface.BOLD else Typeface.NORMAL
 			text.setTextColor(color)
-			text.setTypeface(Typeface.DEFAULT, typefaceStyle)
+			text.setTypeface(FontCache.getDefaultFont(), typefaceStyle)
 			if (shadow != null) {
 				text.showOutline(false)
 				text.invalidateTextViews()
@@ -147,7 +148,7 @@ object PanelAppearanceApplier {
 		applyTextShadow(shadow, appearance, shadowRadius)
 		if (text != null) {
 			text.setTextColor(color)
-			text.setTypeface(Typeface.DEFAULT, typefaceStyle)
+			text.setTypeface(FontCache.getDefaultFont(), typefaceStyle)
 		}
 	}
 
@@ -162,7 +163,7 @@ object PanelAppearanceApplier {
 		if (shadowRadius > 0) {
 			val typefaceStyle = if (appearance.boldText) Typeface.BOLD else Typeface.NORMAL
 			AndroidUiHelper.updateVisibility(shadow, true)
-			shadow.setTypeface(Typeface.DEFAULT, typefaceStyle)
+			shadow.setTypeface(FontCache.getDefaultFont(), typefaceStyle)
 			shadow.paint.strokeWidth = shadowRadius.toFloat()
 			shadow.paint.style = Paint.Style.STROKE
 			shadow.setTextColor(appearance.textShadowColor)

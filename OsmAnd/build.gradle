@@ -106,9 +106,11 @@ android {
 			java.srcDirs = ["src-google", "src-osmand"]
 			manifest.srcFile "AndroidManifest-nightlyFree.xml"
 		}
-		osmPedelec {
+		velopilot {
 			java.srcDirs = ["src-google", "src-osmand"]
-			manifest.srcFile "AndroidManifest-osmPedelec.xml"
+			manifest.srcFile "AndroidManifest-velopilot.xml"
+			// Branding, see branding/generate.py; generateVelopilotStrings adds the strings that call the app VeloPilot
+			res.srcDirs = ["res-velopilot"]
 		}
 		huawei {
 			java.srcDirs = ["src-huawei"]
@@ -135,11 +137,15 @@ android {
 			resValue "string", "app_edition", System.getenv("APP_EDITION") ? System.getenv("APP_EDITION") : ""
 			// resConfig "en"
 		}
-		// OsmPedelec, the speed pedelec fork: installs next to OsmAnd and can use its maps
-		osmPedelec {
+		// VeloPilot, the speed pedelec fork: installs next to OsmAnd and can use its maps
+		velopilot {
 			dimension "version"
-			applicationId "be.osmpedelec.app"
-			resValue "string", "app_name", "OsmPedelec"
+			applicationId "be.velopilot.app"
+			// VeloPilot's own version: the release tag vX.Y.Z sets it in CI (build-container/ci/version.sh), and the
+			// first release takes this versionName
+			versionName System.getenv("APK_VERSION") ?: "0.1.0"
+			versionCode System.getenv("APK_NUMBER_VERSION") ? System.getenv("APK_NUMBER_VERSION").toInteger() : 100
+			resValue "string", "app_name", "VeloPilot"
 			resValue "string", "app_edition", System.getenv("APP_EDITION") ? System.getenv("APP_EDITION") : ""
 			buildConfigField "boolean", "SHARED_OSMAND_MAPS", "true"
 			buildConfigField "String", "DEFAULT_APP_MODE", "\"speed_pedelec\""
@@ -328,5 +334,65 @@ tasks.withType(com.android.build.gradle.tasks.MergeSourceSetFolders).configureEa
 				index.append((text.isEmpty() || text.endsWith("\n") ? "" : "\n") + added.join("\n"))
 			}
 		}
+	}
+}
+
+// VeloPilot calls itself VeloPilot: the strings that mention OsmAnd, in all languages, get VeloPilot instead.
+// They keep naming OsmAnd where they mean OsmAnd's services (OsmAnd Cloud, Live, Pro, Maps, OsmAnd+), the OsmAnd
+// project or the OsmAnd app whose maps VeloPilot can use.
+abstract class GenerateVelopilotStrings extends DefaultTask {
+	@Internal
+	abstract DirectoryProperty getResDir()
+
+	@InputFiles
+	@PathSensitive(PathSensitivity.RELATIVE)
+	FileTree getStrings() {
+		return resDir.get().asFileTree.matching { include "values*/strings.xml" }
+	}
+
+	@OutputDirectory
+	abstract DirectoryProperty getOutputDir()
+
+	@TaskAction
+	void generate() {
+		def keepNames = ~/shared_osmand_maps.*|osmand_team|send_uuid_preference_desc|calculate_online_altitude_descr|help_article_.*|free_versions_descr|install_selected_build|loading_builds.*|select_build_to_install/
+		def element = ~/(?s)<(string-array|plurals|string)\b[^>]*\bname="([^"]+)"[^>]*>.*?<\/\1>/
+		def text = ~/>[^<]*</
+		def osmand = ~/(?<![A-Za-z])OsmAnd(?![A-Za-z0-9_+~]| (?:Cloud|Live|Pro|Maps|Plans|Start|Unlimited)\b| ?\(OSM)/
+		def root = outputDir.get().asFile
+		root.deleteDir()
+		resDir.get().asFile.eachDirMatch(~/values.*/) { dir ->
+			def src = new File(dir, "strings.xml")
+			if (!src.exists()) {
+				return
+			}
+			def xml = src.getText("UTF-8").replaceAll(/(?s)<!--.*?-->/, "")
+			def changed = []
+			(xml =~ element).each { match ->
+				String original = match[0]
+				if (!(match[2] ==~ keepNames)) {
+					def renamed = original.replaceAll(text) { String segment -> segment.replaceAll(osmand, "VeloPilot") }
+					if (renamed != original) {
+						changed << "\t" + renamed
+					}
+				}
+			}
+			if (changed) {
+				def resources = (xml =~ /<resources\b[^>]*>/)[0]
+				def target = new File(root, "${dir.name}/strings.xml")
+				target.parentFile.mkdirs()
+				target.setText("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n${resources}\n${changed.join("\n")}\n</resources>\n", "UTF-8")
+			}
+		}
+	}
+}
+
+def generateVelopilotStrings = tasks.register('generateVelopilotStrings', GenerateVelopilotStrings) {
+	resDir = layout.projectDirectory.dir("res")
+}
+
+androidComponents {
+	onVariants(selector().withFlavor(new kotlin.Pair("version", "velopilot"))) { variant ->
+		variant.sources.res.addGeneratedSourceDirectory(generateVelopilotStrings, { it.outputDir })
 	}
 }

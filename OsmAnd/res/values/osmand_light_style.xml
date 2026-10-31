@@ -67,7 +67,7 @@
         <item name="alertDialogTheme">@style/Theme.MaterialComponents.Light.Dialog.Alert.NoAnimation</item>
     </style>
 
-    <style name="OsmandLightTheme" parent="Theme.MaterialComponents.Light">
+    <style name="OsmandLightTheme" parent="OsmandBaseLightTheme">
         <item name="alert_dialog_theme">@style/OsmandLightTheme</item>
         <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
         <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>

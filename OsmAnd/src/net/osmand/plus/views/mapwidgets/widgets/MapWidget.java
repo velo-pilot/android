@@ -18,6 +18,7 @@ import net.osmand.plus.settings.backend.OsmandSettings;
 import net.osmand.plus.settings.backend.preferences.CommonPreference;
 import net.osmand.plus.settings.enums.ScreenLayoutMode;
 import net.osmand.plus.settings.enums.ThemeUsageContext;
+import net.osmand.plus.utils.FontCache;
 import net.osmand.plus.utils.UiUtilities;
 import net.osmand.plus.views.layers.base.OsmandMapLayer.DrawSettings;
 import net.osmand.plus.views.mapwidgets.MapWidgetInfo;
@@ -213,7 +214,7 @@ public abstract class MapWidget implements PanelAppearanceConsumer {
 
 		if (text != null) {
 			text.setTextColor(textColor);
-			text.setTypeface(Typeface.DEFAULT, typefaceStyle);
+			text.setTypeface(FontCache.getDefaultFont(), typefaceStyle);
 		}
 	}
 
@@ -225,7 +226,7 @@ public abstract class MapWidget implements PanelAppearanceConsumer {
 
 		if (text != null) {
 			text.setTextColor(textColor);
-			text.setTypeface(Typeface.DEFAULT, typefaceStyle);
+			text.setTypeface(FontCache.getDefaultFont(), typefaceStyle);
 			text.showOutline(false);
 		}
 	}
@@ -234,7 +235,7 @@ public abstract class MapWidget implements PanelAppearanceConsumer {
 		if (textShadow != null) {
 			if (shadowRadius > 0) {
 				AndroidUiHelper.updateVisibility(textShadow, true);
-				textShadow.setTypeface(Typeface.DEFAULT, typefaceStyle);
+				textShadow.setTypeface(FontCache.getDefaultFont(), typefaceStyle);
 				textShadow.getPaint().setStrokeWidth(shadowRadius);
 				textShadow.getPaint().setStyle(Style.STROKE);
 				textShadow.setTextColor(textShadowColor);

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- VeloPilot replaces OsmAnd's orange and blue accents with the blue of its logo (#002467). Navy is
+	     unreadable on the dark theme's backgrounds, which use a lighter tint of the same hue (#4A86E8). -->
+
+	<!-- Icons -->
+	<color name="icon_color_osmand_light">#002467</color>
+	<color name="icon_color_osmand_dark">#4A86E8</color>
+	<color name="icon_color_active_light">#002467</color>
+	<color name="icon_color_active_dark">#4A86E8</color>
+	<color name="icon_color_active_light_v2">#002467</color>
+	<color name="icon_color_active_dark_v2">#4A86E8</color>
+	<color name="map_widget_icon_color">#002467</color>
+
+	<!-- AppBar & Status bar -->
+	<color name="app_bar_main_light">#002467</color>
+	<color name="app_bar_active_light">#0D3A8C</color>
+	<color name="status_bar_main_light">#001A4D</color>
+	<color name="status_bar_selection_color_light">#0A2F75</color>
+	<color name="status_bar_dim_light">#000F2B</color>
+
+	<!-- Active -->
+	<color name="active_color_primary_light">#002467</color>
+	<color name="active_color_primary_dark">#4A86E8</color>
+	<color name="active_color_secondary_light">#D9E1F0</color>
+	<color name="active_color_secondary_dark">#142A4D</color>
+	<color name="active_color_primary_light_v2">#002467</color>
+	<color name="active_color_primary_dark_v2">#4A86E8</color>
+	<color name="active_color_secondary_light_v2">#D9E1F0</color>
+	<color name="active_color_secondary_dark_v2">#142A4D</color>
+	<color name="material_switch_outline_light">#6678A0</color>
+	<color name="material_switch_outline_dark">#2F5590</color>
+	<color name="routing_standard_progress_fill_light">#002467</color>
+	<color name="routing_standard_progress_fill_dark">#4A86E8</color>
+
+	<!-- Material 3 -->
+	<color name="primary_light">#002467</color>
+	<color name="primary_dark">#4A86E8</color>
+	<color name="primary_pressed_light">#001A4D</color>
+	<color name="primary_pressed_dark">#3A6FC4</color>
+	<color name="primary_container_light">#D9E1F0</color>
+	<color name="primary_container_dark">#142A4D</color>
+	<color name="primary_container_pressed_light">#B3C2DE</color>
+	<color name="primary_container_pressed_dark">#1F3C6B</color>
+
+	<!-- Buttons -->
+	<color name="active_buttons_and_links_bg_pressed_light">#001A4D</color>
+	<color name="active_buttons_and_links_bg_pressed_dark">#3A6FC4</color>
+	<color name="active_buttons_and_links_trans_light">#66002467</color>
+	<color name="active_buttons_and_links_trans_dark">#664A86E8</color>
+	<color name="btn_bg_primary_light">#002467</color>
+	<color name="btn_bg_primary_dark">#4A86E8</color>
+	<color name="btn_bg_primary_pressed_light">#001A4D</color>
+	<color name="btn_bg_primary_pressed_dark">#3A6FC4</color>
+	<color name="btn_bg_accent_light">#D9E1F0</color>
+	<color name="btn_bg_accent_dark">#142A4D</color>
+	<color name="btn_bg_accent_pressed_light">#B3C2DE</color>
+	<color name="btn_bg_accent_pressed_dark">#0E1D36</color>
+	<color name="btn_outline_accent_light">#8092B3</color>
+	<color name="btn_outline_accent_dark">#2F5590</color>
+	<color name="btn_outline_primary_focused_light">#001A4D</color>
+	<color name="btn_outline_primary_focused_dark">#3A6FC4</color>
+	<color name="btn_text_on_secondary_light">#002467</color>
+	<color name="btn_text_on_secondary_dark">#4A86E8</color>
+	<color name="btn_icon_on_secondary_light">#002467</color>
+	<color name="btn_icon_on_secondary_dark">#4A86E8</color>
+	<color name="btn_bg_icon_focused_light">#D9E1F0</color>
+	<color name="btn_bg_icon_focused_dark">#142A4D</color>
+	<color name="btn_bg_icon_pressed_light">#B3C2DE</color>
+	<color name="btn_bg_icon_pressed_dark">#0E1D36</color>
+	<color name="switch_button_active_light">#1A002467</color>
+	<color name="switch_button_active_dark">#1A4A86E8</color>
+	<color name="switch_button_active_stroke_light">#80002467</color>
+	<color name="switch_button_active_stroke_dark">#804A86E8</color>
+
+	<!-- OsmAnd orange -->
+	<color name="osmand_orange">#002467</color>
+	<color name="osmand_orange_dark">#001A4D</color>
+	<color name="fab_color">#002467</color>
+	<color name="tool_bar_orange_color_light">#B4002467</color>
+	<color name="download_pressed_light">#8C002467</color>
+	<color name="coordinate_input_edit_text_activated">#002467</color>
+	<color name="banner_downloads_remaining_light">#002467</color>
+	<color name="banner_downloads_remaining_dark">#4A86E8</color>
+	<color name="ctx_menu_controller_button_outline_color_dark_p">#4A86E8</color>
+	<color name="route_info_go_btn_inking_dark">#4A86E8</color>
+	<color name="route_info_go_btn_bg_dark_p">#4A86E8</color>
+</resources>

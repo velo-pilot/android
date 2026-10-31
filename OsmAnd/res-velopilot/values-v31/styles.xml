@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ shows only the foreground of the adaptive launcher icon on its splash screen: give it the
+         background of the logo -->
+    <style name="FirstSplashScreenPlus" parent="SplashScreenBaseTheme">
+        <item name="android:windowBackground">@drawable/first_splash_screen_plus</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#002467</item>
+    </style>
+</resources>

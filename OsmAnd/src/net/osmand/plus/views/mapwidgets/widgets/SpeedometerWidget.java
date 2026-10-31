@@ -1,6 +1,5 @@
 package net.osmand.plus.views.mapwidgets.widgets;
 
-import static android.graphics.Typeface.DEFAULT;
 import static net.osmand.plus.settings.enums.SpeedLimitWarningState.ALWAYS;
 import static net.osmand.plus.settings.enums.SpeedLimitWarningState.WHEN_EXCEEDED;
 import static net.osmand.plus.views.mapwidgets.widgets.CurrentSpeedWidget.LOW_SPEED_THRESHOLD_MPS;
@@ -833,7 +832,7 @@ public class SpeedometerWidget {
 		FormattedValue formattedSpeed = OsmAndFormatter.getFormattedSpeedValue(cachedSpeed, app);
 		float unitTextSize = SPEEDOMETER_UNIT_TEXT_SIZE * density;
 		textPaint.setTextSize(unitTextSize);
-		textPaint.setTypeface(DEFAULT);
+		textPaint.setTypeface(FontCache.getDefaultFont());
 		Rect speedUnitRect = new Rect();
 		String speedUnitText = formattedSpeed.unit.toUpperCase();
 		textPaint.getTextBounds(speedUnitText, 0, speedUnitText.length(), speedUnitRect);

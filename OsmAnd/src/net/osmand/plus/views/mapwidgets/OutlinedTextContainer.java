@@ -18,11 +18,13 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 import net.osmand.PlatformUtil;
 import net.osmand.plus.R;
 import net.osmand.plus.base.containers.PaintedText;
 import net.osmand.plus.helpers.AndroidUiHelper;
+import net.osmand.plus.utils.FontCache;
 import net.osmand.plus.widgets.AutoScaleTextView;
 import net.osmand.plus.widgets.FrameLayoutEx;
 import net.osmand.plus.widgets.MultiTextViewEx;
@@ -290,7 +292,7 @@ public class OutlinedTextContainer extends FrameLayoutEx {
 		int outlineColor = Color.WHITE;
 		float outlineWidth = 0f;
 		float textSize = 14f;
-		Typeface typeface = Typeface.DEFAULT;
+		Typeface typeface = FontCache.getDefaultFont();
 		int gravity = 0;
 		CharSequence initialText = "";
 		int maxLines = -1;
@@ -334,8 +336,15 @@ public class OutlinedTextContainer extends FrameLayoutEx {
 				outlineColor = a.getColor(R.styleable.OutlinedTextContainer_outlineColor, outlineColor);
 				outlineWidth = a.getDimension(R.styleable.OutlinedTextContainer_outlineWidth, outlineWidth);
 
+				// A font resource (such as the app font of the theme) or the name of a system font family
+				int fontId = a.getResourceId(R.styleable.OutlinedTextContainer_android_fontFamily, 0);
 				String fontFamily = a.getString(R.styleable.OutlinedTextContainer_android_fontFamily);
-				if (fontFamily != null) {
+				if (fontId != 0 && "font".equals(getResources().getResourceTypeName(fontId))) {
+					Typeface font = ResourcesCompat.getFont(getContext(), fontId);
+					if (font != null) {
+						typeface = font;
+					}
+				} else if (fontFamily != null) {
 					typeface = Typeface.create(fontFamily, Typeface.NORMAL);
 				}
 

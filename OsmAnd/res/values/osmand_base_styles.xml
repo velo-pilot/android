@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Parents of the app themes. A flavour can redefine them to change all themes at once, e.g. the
+         font of the VeloPilot flavour (res-velopilot/values/styles.xml). -->
+    <style name="OsmandBaseLightTheme" parent="Theme.MaterialComponents.Light" />
+    <style name="OsmandBaseDarkTheme" parent="Theme.MaterialComponents" />
+    <style name="OsmandBaseMaterialLightTheme" parent="Theme.Material3.Light" />
+    <style name="OsmandBaseMaterialDarkTheme" parent="Theme.Material3.Dark" />
+</resources>

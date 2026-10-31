@@ -25,7 +25,6 @@ import net.osmand.plus.utils.AndroidUtils;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,8 +77,7 @@ public class NativeCoreContext {
 					obfsCollection.addDirectory(app.getAppPath(IndexConstants.WIKIVOYAGE_INDEX_DIR).getAbsolutePath(), false);
 				}
 				// Read-only maps of another OsmAnd app, see SharedMapsHelper
-				addFiles(obfsCollection, SharedMapsHelper.collectMaps(app, ""));
-				addFiles(obfsCollection, SharedMapsHelper.collectMaps(app, IndexConstants.ROADS_INDEX_DIR));
+				addDirectory(obfsCollection, SharedMapsHelper.linkMaps(app, "maps", "", IndexConstants.ROADS_INDEX_DIR));
 				obfsCollectionsByProviderType.put(ProviderType.MAIN, obfsCollection);
 
 				ObfsCollection contourLinesObfsCollection = null;
@@ -97,13 +95,13 @@ public class NativeCoreContext {
 						srtmIndexDir.mkdir();
 					}
 					obfsCollection.addDirectory(srtmIndexDir.getAbsolutePath(), false);
-					List<File> sharedSrtmFiles = SharedMapsHelper.collectMaps(app, IndexConstants.SRTM_INDEX_DIR);
-					addFiles(obfsCollection, sharedSrtmFiles);
+					File sharedSrtmDir = SharedMapsHelper.linkMaps(app, "srtm", IndexConstants.SRTM_INDEX_DIR);
+					addDirectory(obfsCollection, sharedSrtmDir);
 
 					contourLinesObfsCollection = new ObfsCollection();
 					contourLinesObfsCollection.setIndexCacheFile(cacheFilePath);
 					contourLinesObfsCollection.addDirectory(srtmIndexDir.getAbsolutePath(), false);
-					addFiles(contourLinesObfsCollection, sharedSrtmFiles);
+					addDirectory(contourLinesObfsCollection, sharedSrtmDir);
 					obfsCollectionsByProviderType.put(ProviderType.CONTOUR_LINES, contourLinesObfsCollection);
 				}
 
@@ -126,9 +124,9 @@ public class NativeCoreContext {
 		mapRendererContext.setupObfMap(new MapStylesCollection(), obfsCollectionsByProviderType);
 	}
 
-	private static void addFiles(@NonNull ObfsCollection obfsCollection, @NonNull List<File> files) {
-		for (File file : files) {
-			obfsCollection.addFile(file.getAbsolutePath());
+	private static void addDirectory(@NonNull ObfsCollection obfsCollection, @Nullable File directory) {
+		if (directory != null) {
+			obfsCollection.addDirectory(directory.getAbsolutePath(), false);
 		}
 	}
 }
