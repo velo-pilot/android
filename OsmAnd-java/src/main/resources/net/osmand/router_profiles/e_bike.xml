@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Built-in routing profile for e-bikes: bicycles with pedal assistance up to 25 km/h (EN 15194). Legally a
+	bicycle, so it extends the bicycle profile (routing.xml and router_profiles/bicycle.xml, cycle node network
+	option included) and only changes what the motor and the weight change:
+	  * climbs cost about a third of what they cost on a bicycle (Use elevation data, relief "Plains");
+	  * steps cost more: the bike weighs 20 to 30 kg.
+	The precalculated (HH) routes of the maps are built for the bicycle profile, so it uses standard routing.
+-->
+<osmand_routing_config>
+
+	<routingProfile name="e_bike" extends="bicycle" defaultSpeed="20" hhRouting="false">
+
+		<way attribute="priority">
+			<select value="0.1" t="highway" v="steps"/>
+		</way>
+
+		<!-- Seconds per metre of climb, see the bicycle profile. Only uphill, only for the default relief: steep
+		     descents and the "More plains" and "Hills" choices keep the bicycle rules. -->
+		<way attribute="obstacle_srtm_alt_speed">
+			<if param="height_obstacles">
+				<ifnot param="relief_smoothness_factor_more_plains">
+					<ifnot param="relief_smoothness_factor_hills">
+						<lt value1="25" value2=":incline">
+							<select value="16"/>
+						</lt>
+						<lt value1="13" value2=":incline">
+							<select value="11"/>
+						</lt>
+						<lt value1="7" value2=":incline">
+							<select value="6"/>
+						</lt>
+						<lt value1="3" value2=":incline">
+							<select value="3"/>
+						</lt>
+					</ifnot>
+				</ifnot>
+			</if>
+		</way>
+
+	</routingProfile>
+</osmand_routing_config>

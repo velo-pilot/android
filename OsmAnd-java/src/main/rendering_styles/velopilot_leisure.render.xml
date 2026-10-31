@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	"VeloPilot leisure": VeloPilot travel (velopilot_travel.render.xml) for riding for pleasure. Rules here
+	come before those of VeloPilot travel and the default style (first match wins), constants and rendering
+	attributes here override theirs.
+
+	  * Recreational cycle routes (routes with a colour of their own, such as the Flemish icoonroutes, and
+	    regional and local routes that are not node networks) as solid lines in their colour from zoom 10,
+	    named along the line from zoom 13.
+	  * Cycle highways (F1, F11, ...) step back: a thin muted line, their sign only from zoom 14.
+	  * Woods, forests and parks a little greener, viewpoints and picnic sites from zoom 14.
+-->
+<renderingStyle name="velopilot_leisure" depends="velopilot_travel" defaultColor="#ebe7e4" version="1">
+
+	<renderingConstant name="vlCycleHighwayColor" value="#990A7C86"/>
+	<renderingConstant name="vlCycleHighwayNightColor" value="#992FC4CF"/>
+	<renderingConstant name="vlRouteTextColor" value="#3d3d3d"/>
+	<renderingConstant name="vlRouteTextNightColor" value="#cccccc"/>
+
+	<renderingAttribute name="woodColor">
+		<case nightMode="true" attrColorValue="#1d3a33"/>
+		<case attrColorValue="#7cc663"/>
+	</renderingAttribute>
+	<renderingAttribute name="parkColor">
+		<case nightMode="true" attrColorValue="#1d3a33"/>
+		<case moreDetailed="true" attrColorValue="#a2e294"/>
+		<case attrColorValue="#5515ff00"/>
+	</renderingAttribute>
+
+	<text>
+		<switch minzoom="10" tag="route_type" value="cycling" additional="route_activity_type=road_cycling">
+			<switch additional="!node_network">
+				<!-- Recreational routes: name along the line -->
+				<switch minzoom="13" additional="track_color" nameTag="name" textOnPath="true" textBold="true" textSize="12"
+					textOrder="50" textMinDistance="250" textColor="$vlRouteTextColor" textHaloColor="#ccffffff" textHaloRadius="2">
+					<case additional="network=ncn"/>
+					<case additional="network=rcn"/>
+					<case additional="network=lcn"/>
+					<apply_if nightMode="true" textColor="$vlRouteTextNightColor" textHaloColor="#aa000000"/>
+				</switch>
+				<!-- Cycle highway sign from zoom 14 only (VeloPilot travel draws it) -->
+				<switch maxzoom="13" additional="network=ncn">
+					<case additional="!track_color" disable="true"/>
+				</switch>
+			</switch>
+		</switch>
+	</text>
+
+	<point>
+		<case minzoom="14" tag="tourism" value="viewpoint" icon="tourism_viewpoint" shield="brown_round_shield" iconOrder="85">
+			<apply_if nightMode="true" shield="brown_round_night_shield"/>
+		</case>
+		<case minzoom="14" tag="tourism" value="picnic_site" icon="tourism_picnic_site" shield="picnic_shield" iconOrder="85"/>
+	</point>
+
+	<polygon>
+	</polygon>
+
+	<line>
+		<switch minzoom="10" tag="route_type" value="cycling" additional="route_activity_type=road_cycling" cap="ROUND">
+			<switch additional="!node_network">
+				<!-- Recreational routes in their own colour -->
+				<switch additional="track_color">
+					<case additional="network=ncn"/>
+					<case additional="network=rcn"/>
+					<case additional="network=lcn"/>
+					<apply color="#cc666666"/>
+					<apply_if additional="track_color=red" color="#cce40613"/>
+					<apply_if additional="track_color=orange" color="#ccf29200"/>
+					<apply_if additional="track_color=yellow" color="#ccc8a400"/>
+					<apply_if additional="track_color=green" color="#cc38a838"/>
+					<apply_if additional="track_color=blue" color="#cc3060c0"/>
+					<apply_if additional="track_color=purple" color="#cc8040a0"/>
+					<apply_if additional="track_color=brown" color="#cc905a30"/>
+					<apply_if maxzoom="12" strokeWidth="2:2"/>
+					<apply_if minzoom="13" maxzoom="14" strokeWidth="3:3"/>
+					<apply_if minzoom="15" maxzoom="16" strokeWidth="4:4"/>
+					<apply_if minzoom="17" strokeWidth="5:5"/>
+				</switch>
+				<!-- Cycle highways step back -->
+				<switch hideCycleHighways="false" additional="network=ncn">
+					<case additional="!track_color" color="$vlCycleHighwayColor">
+						<apply_if maxzoom="12" strokeWidth="1.5:1.5"/>
+						<apply_if minzoom="13" maxzoom="15" strokeWidth="2.5:2.5"/>
+						<apply_if minzoom="16" strokeWidth="3.5:3.5"/>
+						<apply_if nightMode="true" color="$vlCycleHighwayNightColor"/>
+					</case>
+				</switch>
+			</switch>
+		</switch>
+	</line>
+
+</renderingStyle>

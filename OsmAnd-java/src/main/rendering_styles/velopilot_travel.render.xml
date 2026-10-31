@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	"Speed pedelec": the OsmAnd default map style tuned for riding a speed pedelec (45 km/h e-bike).
+	"VeloPilot travel": the OsmAnd default map style tuned for getting somewhere by bike, e-bike or speed
+	pedelec, and VeloPilot's default style. "VeloPilot leisure" (velopilot_leisure.render.xml) builds on it.
 	Copied into net/osmand/render next to the styles from OsmAnd-resources by the
 	collectRenderingStylesResources task, and registered in RendererRegistry.
 
@@ -18,7 +19,7 @@
 	and highway=cycleway up to zoom 13. Everything else changes colours or rendering constants,
 	so tunnels, bridges and the other default details keep working.
 -->
-<renderingStyle name="speed_pedelec" depends="default" defaultColor="#ebe7e4" version="1">
+<renderingStyle name="velopilot_travel" depends="default" defaultColor="#ebe7e4" version="1">
 
 	<renderingProperty attr="hideCycleHighways" name="Hide cycle highways"
 		description="Hide the bold rendering of cycle highways and national cycle routes"

@@ -422,7 +422,9 @@ public class RoutePlannerFrontEnd {
 		if (needRequestPrivateAccessRouting(ctx, targets)) {
 			ctx.calculationProgress.requestPrivateAccessRouting = true;
 		}
-		if (hhRoutingConfig != null && ctx.calculationMode != RouteCalculationMode.BASE) {
+		// the precalculated network can't follow every profile or parameter (GeneralRouter.isHHRoutingAllowed)
+		if (hhRoutingConfig != null && ctx.calculationMode != RouteCalculationMode.BASE
+				&& ctx.config.router.isHHRoutingAllowed()) {
 			calculateRegionsWithAllRoutePoints(ctx, osmandRegions, start, targets);
 			if (ctx.nativeLib == null || hhRoutingType == HHRoutingType.JAVA) {
 				HHNetworkRouteRes r = runHHRoute(ctx, start, targets);

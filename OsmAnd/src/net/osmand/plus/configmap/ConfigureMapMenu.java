@@ -37,6 +37,7 @@ import androidx.annotation.StringRes;
 
 import net.osmand.OnResultCallback;
 import net.osmand.PlatformUtil;
+import net.osmand.osm.RenderingPropertyAttr;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
@@ -63,7 +64,9 @@ import net.osmand.plus.widgets.ctxmenu.callback.ItemClickListener;
 import net.osmand.plus.widgets.ctxmenu.callback.OnDataChangeUiAdapter;
 import net.osmand.plus.widgets.ctxmenu.callback.OnRowItemClick;
 import net.osmand.plus.widgets.ctxmenu.data.ContextMenuItem;
+import net.osmand.render.RenderingClass;
 import net.osmand.render.RenderingRuleProperty;
+import net.osmand.render.RenderingRulesStorage;
 import net.osmand.util.Algorithms;
 import net.osmand.util.SunriseSunset;
 
@@ -81,6 +84,8 @@ public class ConfigureMapMenu {
 	private static final Log LOG = PlatformUtil.getLog(ConfigureMapMenu.class);
 
 	public static final String ALPINE_HIKING_SCALE_SCHEME_ATTR = "alpineHikingScaleScheme";
+	// routes.addon.render.xml
+	public static final String CYCLE_NETWORK_NODES_CLASS = ".route.bicycle.node_network_nodes";
 
 	public static final String CURRENT_TRACK_COLOR_ATTR = "currentTrackColor";
 	public static final String CURRENT_TRACK_WIDTH_ATTR = "currentTrackWidth";
@@ -242,6 +247,12 @@ public class ConfigureMapMenu {
 				adapter.addItem(createRoutesItem(activity, attrName, alpineProperty, nightMode));
 			} else if (MapRoutesFragment.shouldShow(app, attrName)) {
 				adapter.addItem(createRoutesItem(activity, attrName, property, nightMode));
+				if (RenderingPropertyAttr.CYCLE_ROUTES.getAttrName().equals(attrName)) {
+					ContextMenuItem nodesItem = createCycleNetworkNodesItem(activity, nightMode);
+					if (nodesItem != null) {
+						adapter.addItem(nodesItem);
+					}
+				}
 			} else {
 				String id = ROUTES_ITEMS_ID_SCHEME + attrName;
 				int iconId = RouteUtils.getIconIdForAttr(attrName);
@@ -306,6 +317,40 @@ public class ConfigureMapMenu {
 						activity.updateLayers();
 						return false;
 					}
+				});
+	}
+
+	/**
+	 * The numbered junctions of cycle node networks (fietsknooppunten) can crowd the map: a switch for the
+	 * rendering class that draws them, also in Cycle routes > rendering classes. The routes stay.
+	 */
+	@Nullable
+	private ContextMenuItem createCycleNetworkNodesItem(@NonNull MapActivity activity, boolean nightMode) {
+		RenderingRulesStorage renderer = app.getRendererRegistry().getCurrentSelectedRenderer();
+		RenderingClass nodesClass = renderer != null ? renderer.getRenderingClass(CYCLE_NETWORK_NODES_CLASS) : null;
+		if (nodesClass == null) {
+			return null;
+		}
+		CommonPreference<Boolean> pref = settings.getBooleanRenderClassProperty(nodesClass);
+		boolean selected = pref.get();
+		return new ContextMenuItem(ROUTES_ITEMS_ID_SCHEME + CYCLE_NETWORK_NODES_CLASS)
+				.setTitleId(R.string.cycle_network_nodes, activity)
+				.setIcon(R.drawable.ic_action_node_network)
+				.setSelected(selected)
+				.setColor(selected ? settings.getApplicationMode().getProfileColor(nightMode) : null)
+				.setDescription(app.getString(selected ? R.string.shared_string_enabled : R.string.shared_string_disabled))
+				.setItemDeleteAction(pref)
+				.setListener((uiAdapter, view, item, isChecked) -> {
+					pref.set(isChecked);
+					item.setSelected(isChecked);
+					item.setColor(activity, isChecked ? R.color.osmand_orange : INVALID_ID);
+					item.setDescription(app.getString(isChecked ? R.string.shared_string_enabled : R.string.shared_string_disabled));
+					if (uiAdapter != null) {
+						uiAdapter.onDataSetChanged();
+					}
+					activity.refreshMapComplete();
+					activity.updateLayers();
+					return false;
 				});
 	}
 

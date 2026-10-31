@@ -6,6 +6,7 @@ import static net.osmand.plus.measurementtool.MeasurementToolFragment.CALCULATE_
 import static net.osmand.plus.measurementtool.MeasurementToolFragment.CALCULATE_SRTM_MODE;
 import static net.osmand.plus.measurementtool.MeasurementToolFragment.FOLLOW_TRACK_MODE;
 import static net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.DRIVING_STYLE;
+import static net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.NODE_NETWORK;
 import static net.osmand.plus.settings.fragments.RouteParametersFragment.RELIEF_SMOOTHNESS_FACTOR;
 import static net.osmand.plus.settings.fragments.RouteParametersFragment.getRoutingParameterTitle;
 import static net.osmand.plus.settings.fragments.RouteParametersFragment.isRoutingParameterSelected;
@@ -767,6 +768,7 @@ public class RouteOptionsBottomSheet extends MenuBottomSheetDialogFragment imple
 
 		BICYCLE(MuteSoundRoutingParameter.KEY,
 				DRIVING_STYLE,
+				NODE_NETWORK,
 				GeneralRouter.USE_HEIGHT_OBSTACLES,
 				DividerItem.KEY,
 				GeneralRouter.ALLOW_MOTORWAYS,

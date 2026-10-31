@@ -31,6 +31,7 @@ public enum ProfileIcons {
 	TRANSPORTER(R.drawable.ic_action_personal_transporter, "ic_action_personal_transporter"),
 	MONOWHEEL(R.drawable.ic_action_monowheel, "ic_action_monowheel"),
 	SCOOTER(R.drawable.ic_action_scooter, "ic_action_scooter"),
+	E_BIKE(R.drawable.ic_action_electric_bike, "ic_action_electric_bike"),
 	SPEED_PEDELEC(R.drawable.ic_action_speed_pedelec, "ic_action_speed_pedelec"),
 	WHEELCHAIR(R.drawable.ic_action_wheelchair, "ic_action_wheelchair"),
 	WHEELCHAIR_FORWARD(R.drawable.ic_action_wheelchair_forward, "ic_action_wheelchair_forward"),

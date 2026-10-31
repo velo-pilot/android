@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <!-- Cycle node network: numbered junctions linked by signposted routes -->
+  <path
+      android:pathData="M6.7,15.9L10.3,8.1M14.2,7.6L17.6,13.4M8,18.6L16,17"
+      android:strokeWidth="2"
+      android:strokeColor="#ffffff"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M12,2A3.5,3.5 0,1 1,12 9A3.5,3.5 0,1 1,12 2ZM12,4A1.5,1.5 0,1 0,12 7A1.5,1.5 0,1 0,12 4Z"
+      android:fillColor="#ffffff"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M5,15A3.5,3.5 0,1 1,5 22A3.5,3.5 0,1 1,5 15ZM5,17A1.5,1.5 0,1 0,5 20A1.5,1.5 0,1 0,5 17Z"
+      android:fillColor="#ffffff"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M19,13A3.5,3.5 0,1 1,19 20A3.5,3.5 0,1 1,19 13ZM19,15A1.5,1.5 0,1 0,19 18A1.5,1.5 0,1 0,19 15Z"
+      android:fillColor="#ffffff"
+      android:fillType="evenOdd"/>
+</vector>

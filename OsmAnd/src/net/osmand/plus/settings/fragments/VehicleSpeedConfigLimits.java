@@ -47,6 +47,7 @@ public class VehicleSpeedConfigLimits {
 			case "car":
 				return MAX_CAR_SPEED_LIMIT;
 			case "bicycle":
+			case "e_bike":
 				return MAX_BICYCLE_SPEED_LIMIT;
 			case "pedestrian":
 				return MAX_PEDESTRIAN_SPEED_LIMIT;

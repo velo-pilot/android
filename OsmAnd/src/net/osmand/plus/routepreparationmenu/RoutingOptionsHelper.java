@@ -64,6 +64,8 @@ public class RoutingOptionsHelper {
 
 	public static final String MORE_VALUE = "MORE_VALUE";
 	public static final String DRIVING_STYLE = "driving_style";
+	// Cycle node network (fietsknooppunten) routing parameters: off, prefer or strict
+	public static final String NODE_NETWORK = "node_network";
 
 	private final OsmandApplication app;
 
@@ -516,6 +518,9 @@ public class RoutingOptionsHelper {
 			if (DRIVING_STYLE.equals(group.getGroupName())) {
 				rp.activeIconId = R.drawable.ic_action_bicycle_dark;
 				rp.disabledIconId = R.drawable.ic_action_bicycle_dark;
+			} else if (NODE_NETWORK.equals(group.getGroupName())) {
+				rp.activeIconId = R.drawable.ic_action_node_network;
+				rp.disabledIconId = R.drawable.ic_action_node_network;
 			}
 		}
 		if (rp.routingParameter == null) {

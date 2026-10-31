@@ -15,7 +15,8 @@ import java.util.List;
 public enum PermanentAppModeOptions {
 
 	CAR(MuteSoundRoutingParameter.KEY, AvoidRoadsRoutingParameter.KEY),
-	BICYCLE(MuteSoundRoutingParameter.KEY, RoutingOptionsHelper.DRIVING_STYLE, USE_HEIGHT_OBSTACLES),
+	BICYCLE(MuteSoundRoutingParameter.KEY, RoutingOptionsHelper.DRIVING_STYLE, RoutingOptionsHelper.NODE_NETWORK,
+			USE_HEIGHT_OBSTACLES),
 	PEDESTRIAN(MuteSoundRoutingParameter.KEY, USE_HEIGHT_OBSTACLES),
 	PUBLIC_TRANSPORT(MuteSoundRoutingParameter.KEY, AvoidPTTypesRoutingParameter.KEY),
 	BOAT(MuteSoundRoutingParameter.KEY),

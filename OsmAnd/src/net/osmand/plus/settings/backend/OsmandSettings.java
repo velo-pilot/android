@@ -5,6 +5,7 @@ import static net.osmand.aidlapi.OsmAndCustomizationConstants.CONFIGURE_MAP_ITEM
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.DRAWER_ITEM_ID_SCHEME;
 import static net.osmand.aidlapi.OsmAndCustomizationConstants.MAP_CONTEXT_MENU_ACTIONS;
 import static net.osmand.plus.AppVersionUpgradeOnInit.updateExistingWidgetIds;
+import static net.osmand.plus.configmap.routes.RouteUtils.CYCLE_NODE_NETWORK_ROUTES_ATTR;
 import static net.osmand.plus.backup.AutoBackupHelper.DEFAULT_AUTO_BACKUP_INTERVAL_MS;
 import static net.osmand.plus.download.DownloadOsmandIndexesHelper.downloadTtsWithoutInternet;
 import static net.osmand.plus.download.DownloadOsmandIndexesHelper.getSupportedTtsByLanguages;
@@ -59,6 +60,7 @@ import net.osmand.map.ITileSource;
 import net.osmand.map.TileSourceManager;
 import net.osmand.map.TileSourceManager.TileSourceTemplate;
 import net.osmand.osm.MapPoiTypes;
+import net.osmand.osm.RenderingPropertyAttr;
 import net.osmand.osm.io.NetworkUtils;
 import net.osmand.plus.BuildConfig;
 import net.osmand.plus.OsmandApplication;
@@ -1299,6 +1301,7 @@ public class OsmandSettings {
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.DEFAULT, 1.5f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.CAR, 12.5f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.BICYCLE, 2.77f);
+		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.E_BIKE, 5.56f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, 9.72f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.PEDESTRIAN, 1.11f);
 		DEFAULT_SPEED.setModeDefaultValue(ApplicationMode.BOAT, 1.38f);
@@ -1331,6 +1334,7 @@ public class OsmandSettings {
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.PEDESTRIAN, "ic_action_pedestrian_dark");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.PUBLIC_TRANSPORT, "ic_action_bus_dark");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.MOPED, "ic_action_motor_scooter");
+		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.E_BIKE, "ic_action_electric_bike");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, "ic_action_speed_pedelec");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.BOAT, "ic_action_sail_boat_dark");
 		ICON_RES_NAME.setModeDefaultValue(ApplicationMode.AIRCRAFT, "ic_action_aircraft");
@@ -1369,6 +1373,7 @@ public class OsmandSettings {
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.SKI, "ski");
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.HORSE, "horsebackriding");
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.MOPED, "moped");
+		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.E_BIKE, "e_bike");
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, "speed_pedelec");
 		ROUTING_PROFILE.setModeDefaultValue(ApplicationMode.TRAIN, "train");
 	}
@@ -1425,13 +1430,14 @@ public class OsmandSettings {
 		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.TRUCK, 4);
 		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.MOTORCYCLE, 5);
 		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.MOPED, 6);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, 7);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.PUBLIC_TRANSPORT, 8);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.TRAIN, 9);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.BOAT, 10);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.AIRCRAFT, 11);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.SKI, 12);
-		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.HORSE, 13);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.E_BIKE, 7);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, 8);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.PUBLIC_TRANSPORT, 9);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.TRAIN, 10);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.BOAT, 11);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.AIRCRAFT, 12);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.SKI, 13);
+		APP_MODE_ORDER.setModeDefaultValue(ApplicationMode.HORSE, 14);
 	}
 
 	public final CommonPreference<Integer> APP_MODE_VERSION = new IntPreference(this, "app_mode_version", 0).makeProfile().cache();
@@ -1818,6 +1824,7 @@ public class OsmandSettings {
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.MOTORCYCLE, "adventure_motorcycling");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.HORSE, "horse_riding");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.MOPED, "motor_scooter");
+		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.E_BIKE, "e_biking");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, "e_biking");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.PEDESTRIAN, "walking");
 		CURRENT_TRACK_ROUTE_ACTIVITY.setModeDefaultValue(ApplicationMode.SKI, "skiing");
@@ -3184,7 +3191,13 @@ public class OsmandSettings {
 		return Algorithms.isEmpty(voiceProvider) || VOICE_PROVIDER_NOT_USE.equals(voiceProvider);
 	}
 
-	public final CommonPreference<String> RENDERER = new StringPreference(this, "renderer", RendererRegistry.DEFAULT_RENDER) {
+	public final CommonPreference<String> RENDERER = new StringPreference(this, "renderer", BuildConfig.DEFAULT_RENDERER) {
+
+		@Override
+		public String getValue(@NonNull Object prefs, String defaultValue) {
+			String value = super.getValue(prefs, defaultValue);
+			return RendererRegistry.LEGACY_SPEED_PEDELEC_RENDER.equals(value) ? RendererRegistry.VELOPILOT_TRAVEL_RENDER : value;
+		}
 
 		@Override
 		protected boolean setValue(Object prefs, String val) {
@@ -3203,7 +3216,11 @@ public class OsmandSettings {
 	{
 		RENDERER.setModeDefaultValue(ApplicationMode.BOAT, RendererRegistry.NAUTICAL_RENDER);
 		RENDERER.setModeDefaultValue(ApplicationMode.SKI, RendererRegistry.WINTER_SKI_RENDER);
-		RENDERER.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, RendererRegistry.SPEED_PEDELEC_RENDER);
+		// The cycling style (cycle highways in their road sign, cycle paths from zoom 12), also where the build's
+		// default style is OsmAnd's
+		RENDERER.setModeDefaultValue(ApplicationMode.BICYCLE, RendererRegistry.VELOPILOT_TRAVEL_RENDER);
+		RENDERER.setModeDefaultValue(ApplicationMode.E_BIKE, RendererRegistry.VELOPILOT_TRAVEL_RENDER);
+		RENDERER.setModeDefaultValue(ApplicationMode.SPEED_PEDELEC, RendererRegistry.VELOPILOT_TRAVEL_RENDER);
 	}
 
 	public boolean getRenderBooleanPropertyValue(@NonNull RenderingRuleProperty property) {
@@ -3543,6 +3560,19 @@ public class OsmandSettings {
 
 	public final CommonPreference<Boolean> LAST_CYCLE_ROUTES_NODE_NETWORK_STATE =
 			new BooleanPreference(this, "cycle_routes_last_node_network_state", false).makeProfile();
+
+	{
+		// Cycling profiles show cycle routes as node networks (fietsknooppunten): numbered junctions and the routes
+		// between them, as on the signs
+		ApplicationMode[] cyclingModes = {ApplicationMode.BICYCLE, ApplicationMode.E_BIKE, ApplicationMode.SPEED_PEDELEC};
+		CommonPreference<Boolean> cycleRoutes = getCustomRenderBooleanProperty(RenderingPropertyAttr.CYCLE_ROUTES.getAttrName());
+		CommonPreference<Boolean> nodeNetwork = getCustomRenderBooleanProperty(CYCLE_NODE_NETWORK_ROUTES_ATTR);
+		for (ApplicationMode mode : cyclingModes) {
+			cycleRoutes.setModeDefaultValue(mode, true);
+			nodeNetwork.setModeDefaultValue(mode, true);
+			LAST_CYCLE_ROUTES_NODE_NETWORK_STATE.setModeDefaultValue(mode, true);
+		}
+	}
 
 	public final CommonPreference<String> LAST_MTB_ROUTES_CLASSIFICATION =
 			new StringPreference(this, "mtb_routes_last_classification", MtbClassification.SCALE.attrName).makeProfile();

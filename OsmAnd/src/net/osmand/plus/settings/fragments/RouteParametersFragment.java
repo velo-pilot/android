@@ -1,6 +1,7 @@
 package net.osmand.plus.settings.fragments;
 
 import static net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.DRIVING_STYLE;
+import static net.osmand.plus.routepreparationmenu.RoutingOptionsHelper.NODE_NETWORK;
 import static net.osmand.plus.settings.backend.OsmandSettings.ROUTING_PREFERENCE_PREFIX;
 import static net.osmand.plus.settings.fragments.DangerousGoodsFragment.getHazmatUsaClass;
 import static net.osmand.plus.settings.fragments.SettingsScreenType.DANGEROUS_GOODS;
@@ -105,6 +106,7 @@ public class RouteParametersFragment extends BaseSettingsFragment {
 	private final List<RoutingParameter> avoidParameters = new ArrayList<>();
 	private final List<RoutingParameter> preferParameters = new ArrayList<>();
 	private final List<RoutingParameter> drivingStyleParameters = new ArrayList<>();
+	private final List<RoutingParameter> nodeNetworkParameters = new ArrayList<>();
 	private final List<RoutingParameter> reliefFactorParameters = new ArrayList<>();
 	private final List<RoutingParameter> hazmatCategoryUSAParameters = new ArrayList<>();
 	private final List<RoutingParameter> otherRoutingParameters = new ArrayList<>();
@@ -262,6 +264,8 @@ public class RouteParametersFragment extends BaseSettingsFragment {
 					reliefFactorParameters.add(routingParameter);
 				} else if (DRIVING_STYLE.equals(routingParameter.getGroup())) {
 					drivingStyleParameters.add(routingParameter);
+				} else if (NODE_NETWORK.equals(routingParameter.getGroup())) {
+					nodeNetworkParameters.add(routingParameter);
 				} else if (param.startsWith(HAZMAT_CATEGORY_USA_PREFIX)) {
 					hazmatCategoryUSAParameters.add(routingParameter);
 				} else if ((!param.equals(USE_SHORTEST_WAY) || am.isDerivedRoutingFrom(ApplicationMode.CAR))
@@ -278,6 +282,9 @@ public class RouteParametersFragment extends BaseSettingsFragment {
 			if (!drivingStyleParameters.isEmpty()) {
 				ListPreferenceEx drivingStyleRouting = createRoutingBooleanListPreference(DRIVING_STYLE, drivingStyleParameters);
 				screen.addPreference(drivingStyleRouting);
+			}
+			if (!nodeNetworkParameters.isEmpty()) {
+				screen.addPreference(createRoutingBooleanListPreference(NODE_NETWORK, nodeNetworkParameters));
 			}
 			if (!avoidParameters.isEmpty()) {
 				String title;
@@ -844,8 +851,13 @@ public class RouteParametersFragment extends BaseSettingsFragment {
 	@Override
 	public void onApplyPreferenceChange(String prefId, boolean applyToAllProfiles,
 			Object newValue) {
-		if ((RELIEF_SMOOTHNESS_FACTOR.equals(prefId) || DRIVING_STYLE.equals(prefId)) && newValue instanceof String) {
-			List<RoutingParameter> routingParameters = DRIVING_STYLE.equals(prefId) ? drivingStyleParameters : reliefFactorParameters;
+		if ((RELIEF_SMOOTHNESS_FACTOR.equals(prefId) || DRIVING_STYLE.equals(prefId) || NODE_NETWORK.equals(prefId))
+				&& newValue instanceof String) {
+			List<RoutingParameter> routingParameters = switch (prefId) {
+				case DRIVING_STYLE -> drivingStyleParameters;
+				case NODE_NETWORK -> nodeNetworkParameters;
+				default -> reliefFactorParameters;
+			};
 			updateSelectedParameters(app, getSelectedAppMode(), routingParameters, (String) newValue);
 		} else if (ROUTING_SHORT_WAY.equals(prefId) && newValue instanceof Boolean) {
 			applyPreference(ROUTING_SHORT_WAY, applyToAllProfiles, newValue);
@@ -952,6 +964,7 @@ public class RouteParametersFragment extends BaseSettingsFragment {
 		avoidParameters.clear();
 		preferParameters.clear();
 		drivingStyleParameters.clear();
+		nodeNetworkParameters.clear();
 		reliefFactorParameters.clear();
 		otherRoutingParameters.clear();
 		hazmatCategoryUSAParameters.clear();
@@ -1011,6 +1024,7 @@ public class RouteParametersFragment extends BaseSettingsFragment {
 			case AVOID_ROUTING_PARAMETER_PREFIX ->
 					getPersistentPrefIcon(R.drawable.ic_action_alert);
 			case DRIVING_STYLE -> getPersistentPrefIcon(R.drawable.ic_action_bicycle_dark);
+			case NODE_NETWORK -> getPersistentPrefIcon(R.drawable.ic_action_node_network);
 			case "fast_route_mode" -> getPersistentPrefIcon(R.drawable.ic_action_fastest_route);
 			case "enable_time_conditional_routing" ->
 					getPersistentPrefIcon(R.drawable.ic_action_road_works_dark);

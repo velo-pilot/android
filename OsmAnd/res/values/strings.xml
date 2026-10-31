@@ -11,6 +11,19 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="routing_attr_driving_style_leisure_name">Leisure</string>
+	<string name="routing_attr_driving_style_leisure_description">Slower but nicer: signposted cycle routes, cycle paths and quiet roads, away from main roads.</string>
+	<string name="cycle_network_nodes">Cycle network nodes</string>
+	<string name="app_mode_e_bike">E-bike</string>
+	<string name="app_mode_e_bike_descr">Bicycle with pedal assistance up to 25 km/h. Follows bicycle rules; climbs count for less.</string>
+	<string name="routing_attr_node_network_name">Cycle node network</string>
+	<string name="routing_attr_node_network_description">Follow the numbered junctions of the cycle node network (fietsknooppunten) and other signposted cycle routes.</string>
+	<string name="routing_attr_node_network_off_name">Off</string>
+	<string name="routing_attr_node_network_off_description">Ignore the cycle node network.</string>
+	<string name="routing_attr_node_network_prefer_name">Prefer</string>
+	<string name="routing_attr_node_network_prefer_description">Prefer the cycle node network and other signposted cycle routes, with a small detour if needed.</string>
+	<string name="routing_attr_node_network_strict_name">Stay on the network</string>
+	<string name="routing_attr_node_network_strict_description">Leave the cycle node network only to reach the start or destination, or where it has a gap.</string>
 	<string name="shared_osmand_maps_prompt_title">Use your OsmAnd maps?</string>
 	<string name="shared_osmand_maps_prompt_no_access">OsmAnd is on this phone, so %1$s can use its maps instead of downloading them again.\n\nTap Allow access, turn on the switch and come back. %1$s only reads the maps; it never installs apps.</string>
 	<string name="shared_osmand_maps_prompt_move_title">Move your OsmAnd maps</string>
@@ -22,7 +35,10 @@
 	<string name="shared_osmand_maps_no_access">Use the maps of the OsmAnd app instead of downloading them again. Tap to allow access, then in OsmAnd set Settings › OsmAnd settings › Main storage to Multiuser storage.</string>
 	<string name="shared_osmand_maps_not_found">No OsmAnd maps found. In OsmAnd, go to Settings › OsmAnd settings › Main storage, choose Multiuser storage, then Move to the new destination.</string>
 	<string name="shared_osmand_maps_found">%1$d maps in use from %2$s</string>
-	<string name="speed_pedelec_render_descr">Highlights cycle highways, cycle paths and railways, which often have a cycle path alongside. Motorways and trunk roads are muted.</string>
+	<string name="velopilot_travel_renderer">VeloPilot travel</string>
+	<string name="velopilot_travel_render_descr">For getting somewhere by bike: highlights cycle highways, cycle paths and railways, which often have a cycle path alongside. Motorways and trunk roads are muted.</string>
+	<string name="velopilot_leisure_renderer">VeloPilot leisure</string>
+	<string name="velopilot_leisure_render_descr">For riding for pleasure: highlights recreational cycle routes in their colours, woods, parks and viewpoints. Cycle highways step back.</string>
 	<string name="rendering_attr_hideCycleHighways_name">Hide cycle highways</string>
 	<string name="rendering_attr_hideCycleHighways_description">Hide the bold rendering of cycle highways and national cycle routes</string>
 	<string name="app_mode_speed_pedelec">Speed pedelec</string>

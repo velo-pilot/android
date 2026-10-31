@@ -56,6 +56,8 @@ public class GeneralRouter implements VehicleRouter {
 	public static final String WEIGHT_RATING = "weightrating";
 	public static final String ALLOW_VIA_FERRATA = "allow_via_ferrata";
 	public static final String CHECK_ALLOW_PRIVATE_NEEDED = "check_allow_private_needed";
+	// profile attribute and parameter attribute: "false" when the precalculated (HH) network can't follow the profile
+	public static final String HH_ROUTING = "hhRouting";
 	private static final double MIN_DISTANCE_SLOPE_ROUND = 10;
 
 	private static boolean USE_CACHE = true;
@@ -292,6 +294,34 @@ public class GeneralRouter implements VehicleRouter {
 	
 	public RouteAttributeContext getObjContext(RouteDataObjectAttribute a) {
 		return objectAttributes[a.ordinal()];
+	}
+
+	/**
+	 * With prepend, rules registered from now on go before the rules the router already has, so they win
+	 * (first match): a profile that extends another one overrides its rules this way.
+	 */
+	public void setPrependRules(boolean prepend) {
+		for (RouteAttributeContext ctx : objectAttributes) {
+			ctx.insertIndex = prepend ? 0 : -1;
+		}
+	}
+
+	/**
+	 * The precalculated (HH) routing network is built with the default parameters of the base profile. Profiles
+	 * and parameters that change the costs in a way it can't follow say hhRouting="false".
+	 */
+	public boolean isHHRoutingAllowed() {
+		if ("false".equals(attributes.get(HH_ROUTING))) {
+			return false;
+		}
+		for (String paramId : parameterValues.keySet()) {
+			RoutingParameter parameter = parameters.get(paramId);
+			if (parameter != null && !parameter.isHHRouting()
+					&& parseSilentBoolean(parameterValues.get(paramId), true)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 
@@ -776,6 +806,7 @@ public class GeneralRouter implements VehicleRouter {
 		private String[] profiles;
 		private boolean defaultBoolean;
 		private double defaultNumeric;
+		private boolean hhRouting = true;
 
 		public String getId() {
 			return id;
@@ -811,6 +842,13 @@ public class GeneralRouter implements VehicleRouter {
 		public String[] getProfiles() {
 			return profiles;
 		}
+		// false: the precalculated (HH) routing network is built without this parameter and can't follow it
+		public boolean isHHRouting() {
+			return hhRouting;
+		}
+		public void setHHRouting(boolean hhRouting) {
+			this.hhRouting = hhRouting;
+		}
 	}
 	
 	
@@ -822,6 +860,9 @@ public class GeneralRouter implements VehicleRouter {
 	public class RouteAttributeContext {
 		List<RouteAttributeEvalRule> rules = new ArrayList<RouteAttributeEvalRule>();
 		ParameterContext paramContext = null;
+		// >= 0: new rules are inserted from this index on, before the rules that are already there
+		private int insertIndex = -1;
+		private RouteAttributeEvalRule lastRule;
 		
 		public RouteAttributeContext(){
 		}
@@ -868,12 +909,17 @@ public class GeneralRouter implements VehicleRouter {
 		public RouteAttributeEvalRule registerNewRule(String selectValue, String selectType) {
 			RouteAttributeEvalRule ev = new RouteAttributeEvalRule();
 			ev.registerSelectValue(selectValue, selectType);
-			rules.add(ev);	
+			if (insertIndex >= 0) {
+				rules.add(insertIndex++, ev);
+			} else {
+				rules.add(ev);
+			}
+			lastRule = ev;
 			return ev;
 		}
 		
 		public RouteAttributeEvalRule getLastRule() {
-			return rules.get(rules.size() - 1);
+			return lastRule != null ? lastRule : rules.get(rules.size() - 1);
 		}
 
 		private synchronized Object evaluate(BitSet types) {

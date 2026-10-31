@@ -77,6 +77,9 @@ public class ApplicationMode {
 	public static final ApplicationMode MOPED = create(BICYCLE, R.string.app_mode_moped, "moped")
 			.icon(R.drawable.ic_action_motor_scooter)
 			.description(R.string.app_mode_moped).reg();
+	public static final ApplicationMode E_BIKE = create(BICYCLE, R.string.app_mode_e_bike, "e_bike")
+			.icon(R.drawable.ic_action_electric_bike)
+			.description(R.string.app_mode_e_bike_descr).reg();
 	public static final ApplicationMode SPEED_PEDELEC = create(BICYCLE, R.string.app_mode_speed_pedelec, "speed_pedelec")
 			.icon(R.drawable.ic_action_speed_pedelec)
 			.description(R.string.app_mode_speed_pedelec_descr).reg();
@@ -523,6 +526,9 @@ public class ApplicationMode {
 		}
 		if (settings.APP_MODE_ORDER.isSetForMode(MOPED) && !settings.APP_MODE_ORDER.isSetForMode(SPEED_PEDELEC)) {
 			SPEED_PEDELEC.setOrder(MOPED.getOrder() + 1);
+		}
+		if (settings.APP_MODE_ORDER.isSetForMode(SPEED_PEDELEC) && !settings.APP_MODE_ORDER.isSetForMode(E_BIKE)) {
+			E_BIKE.setOrder(SPEED_PEDELEC.getOrder());
 		}
 		if (settings.APP_MODE_ORDER.isSetForMode(SKI) && !settings.APP_MODE_ORDER.isSetForMode(HORSE)) {
 			HORSE.setOrder(SKI.getOrder() + 1);

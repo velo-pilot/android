@@ -62,7 +62,9 @@ android {
 		buildConfigField "boolean", "SHARED_OSMAND_MAPS", "false"
 		// Profile the app starts in and the profiles shown on a fresh install
 		buildConfigField "String", "DEFAULT_APP_MODE", "\"default\""
-		buildConfigField "String", "DEFAULT_AVAILABLE_APP_MODES", "\"car,bicycle,pedestrian,speed_pedelec,public_transport,\""
+		// Map style of profiles without their own default (RendererRegistry key)
+		buildConfigField "String", "DEFAULT_RENDERER", "\"OsmAnd\""
+		buildConfigField "String", "DEFAULT_AVAILABLE_APP_MODES", "\"car,bicycle,e_bike,pedestrian,speed_pedelec,public_transport,\""
 	}
 
 	lintOptions {
@@ -149,7 +151,8 @@ android {
 			resValue "string", "app_edition", System.getenv("APP_EDITION") ? System.getenv("APP_EDITION") : ""
 			buildConfigField "boolean", "SHARED_OSMAND_MAPS", "true"
 			buildConfigField "String", "DEFAULT_APP_MODE", "\"speed_pedelec\""
-			buildConfigField "String", "DEFAULT_AVAILABLE_APP_MODES", "\"speed_pedelec,bicycle,pedestrian,\""
+			buildConfigField "String", "DEFAULT_RENDERER", "\"VeloPilot travel\""
+			buildConfigField "String", "DEFAULT_AVAILABLE_APP_MODES", "\"bicycle,e_bike,speed_pedelec,\""
 		}
 		androidFull {
 			dimension "version"

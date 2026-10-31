@@ -33,7 +33,12 @@ public class RoutingConfiguration {
 	public static final int DEFAULT_NATIVE_MEMORY_LIMIT = 256;
 	public static final float DEVIATION_RADIUS = 3000;
 	public static final double DEFAULT_PENALTY_FOR_REVERSE_DIRECTION = 60; // if no penaltyForReverseDirection in xml
-	private static final String[] BUNDLED_ROUTING_PROFILES = {"/net/osmand/router_profiles/speed_pedelec.xml"};
+	private static final String DEFAULT_ROUTING_XML = "routing.xml";
+	// Parsed in this order after routing.xml: a profile can only extend profiles defined before it
+	private static final String[] BUNDLED_ROUTING_PROFILES = {
+			"/net/osmand/router_profiles/speed_pedelec.xml",
+			"/net/osmand/router_profiles/bicycle.xml",
+			"/net/osmand/router_profiles/e_bike.xml"};
 	public Map<String, String> attributes = new LinkedHashMap<String, String>();
 
 	// 1. parameters of routing and different tweaks
@@ -154,6 +159,8 @@ public class RoutingConfiguration {
 		// Design time storage
 		private String defaultRouter = "";
 		private Map<String, GeneralRouter> routers = new LinkedHashMap<>();
+		// Every <routingProfile> element that makes up a profile, oldest first, for profiles with extends="..."
+		private final Map<String, List<ProfileSource>> profileSources = new LinkedHashMap<>();
 		private Map<String, String> attributes = new LinkedHashMap<>();
 		private Set<Long> impassableRoadLocations = new HashSet<>();
 		private QuadTree<Node> directionPointsBuilder;
@@ -341,7 +348,9 @@ public class RoutingConfiguration {
 
 	public static Builder parseDefault() {
 		try {
-			Builder builder = parseFromInputStream(RoutingConfiguration.class.getResourceAsStream("routing.xml"));
+			Builder builder = new Builder();
+			parseFromInputStream(RoutingConfiguration.class.getResourceAsStream(DEFAULT_ROUTING_XML), null, builder,
+					DEFAULT_ROUTING_XML, null, null);
 			parseBundledProfiles(builder);
 			return builder;
 		} catch (Exception e) {
@@ -355,7 +364,7 @@ public class RoutingConfiguration {
 			InputStream is = RoutingConfiguration.class.getResourceAsStream(resource);
 			if (is != null) {
 				String defaultRouter = builder.defaultRouter;
-				parseFromInputStream(is, null, builder);
+				parseFromInputStream(is, null, builder, resource, null, null);
 				builder.defaultRouter = defaultRouter;
 			}
 		}
@@ -366,7 +375,18 @@ public class RoutingConfiguration {
 	}
 
 	public static RoutingConfiguration.Builder parseFromInputStream(InputStream is, String filename, RoutingConfiguration.Builder config) throws IOException, XmlPullParserException {
+		return parseFromInputStream(is, filename, config, null, null, null);
+	}
+
+	/**
+	 * @param resource class resource the stream comes from, so that later profiles can extend the profiles in it
+	 * @param onlyProfile with target: only parse the routingProfile element with this name, into target
+	 */
+	private static RoutingConfiguration.Builder parseFromInputStream(InputStream is, String filename,
+			RoutingConfiguration.Builder config, String resource, String onlyProfile, GeneralRouter target)
+			throws IOException, XmlPullParserException {
 		XmlPullParser parser = PlatformUtil.newXMLPullParser();
+		boolean replay = target != null;
 		GeneralRouter currentRouter = null;
 		RouteDataObjectAttribute currentAttribute = null;
 		String preType = null;
@@ -376,10 +396,22 @@ public class RoutingConfiguration {
 		while ((tok = parser.next()) != XmlPullParser.END_DOCUMENT) {
 			if (tok == XmlPullParser.START_TAG) {
 				String name = parser.getName();
-				if ("osmand_routing_config".equals(name)) {
+				if ("routingProfile".equals(name)) {
+					if (replay) {
+						currentRouter = replayRoutingProfile(parser, onlyProfile, target);
+					} else if (parser.getAttributeValue("", "extends") != null) {
+						currentRouter = parseExtendingProfile(parser, config, filename, resource);
+					} else {
+						currentRouter = parseRoutingProfile(parser, config, filename);
+						if (resource != null) {
+							config.profileSources.put(currentRouter.getProfileName(), new ArrayList<ProfileSource>());
+							addProfileSource(config, currentRouter.getProfileName(), resource);
+						}
+					}
+				} else if (replay && currentRouter == null) {
+					// outside the profile that is replayed
+				} else if ("osmand_routing_config".equals(name)) {
 					config.defaultRouter = parser.getAttributeValue("", "defaultProfile");
-				} else if ("routingProfile".equals(name)) {
-					currentRouter = parseRoutingProfile(parser, config, filename);
 				} else if ("attribute".equals(name)) {
 					parseAttribute(parser, config, currentRouter);
 				} else if ("parameter".equals(name)) {
@@ -393,13 +425,90 @@ public class RoutingConfiguration {
 				}
 			} else if (tok == XmlPullParser.END_TAG) {
 				String pname = parser.getName();
-				if (checkTag(pname)) {
+				if ("routingProfile".equals(pname)) {
+					if (currentRouter != null) {
+						currentRouter.setPrependRules(false);
+					}
+					if (replay) {
+						currentRouter = null;
+					}
+				} else if (checkTag(pname) && !(replay && currentRouter == null)) {
 					rulesStck.pop();
 				}
 			}
 		}
 		is.close();
 		return config;
+	}
+
+	private static class ProfileSource {
+		final String resource;
+		final String profileName;
+
+		ProfileSource(String resource, String profileName) {
+			this.resource = resource;
+			this.profileName = profileName;
+		}
+	}
+
+	private static void addProfileSource(Builder config, String profileName, String resource) {
+		config.profileSources.get(profileName).add(new ProfileSource(resource, profileName));
+	}
+
+	/**
+	 * <routingProfile name="x" extends="y">: x starts as a copy of profile y as it is defined at this point,
+	 * routing.xml and earlier extensions included, rebuilt from their XML. Attributes of x override those of y,
+	 * the rules of x come before those of y (first match wins) and parameters of x are added. With x = y the
+	 * profile is extended in place.
+	 */
+	private static GeneralRouter parseExtendingProfile(XmlPullParser parser, Builder config, String filename,
+			String resource) throws IOException, XmlPullParserException {
+		String name = parser.getAttributeValue("", "name");
+		String base = parser.getAttributeValue("", "extends");
+		List<ProfileSource> baseSources = config.profileSources.get(base);
+		GeneralRouter baseRouter = config.routers.get(base);
+		if (baseSources == null || baseRouter == null) {
+			throw new IllegalStateException("Routing profile " + name + " extends unknown profile " + base);
+		}
+		GeneralRouterProfile profile = Algorithms.parseEnumValue(GeneralRouterProfile.values(),
+				parser.getAttributeValue("", "baseProfile"), baseRouter.getProfile());
+		GeneralRouter router = new GeneralRouter(profile, new LinkedHashMap<String, String>());
+		router.setProfileName(name);
+		for (ProfileSource source : baseSources) {
+			InputStream is = RoutingConfiguration.class.getResourceAsStream(source.resource);
+			if (is == null) {
+				throw new IllegalStateException("Routing profile " + base + " not found in " + source.resource);
+			}
+			parseFromInputStream(is, null, config, null, source.profileName, router);
+		}
+		for (int i = 0; i < parser.getAttributeCount(); i++) {
+			router.addAttribute(parser.getAttributeName(i), parser.getAttributeValue(i));
+		}
+		router.setPrependRules(true);
+
+		String key = name;
+		if (filename != null) {
+			router.setFilename(filename);
+			key = filename + "/" + name;
+		}
+		config.routers.put(key, router);
+		if (resource != null) {
+			config.profileSources.put(name, new ArrayList<ProfileSource>(baseSources));
+			addProfileSource(config, name, resource);
+		}
+		return router;
+	}
+
+	// One element of a profile that is rebuilt for parseExtendingProfile(); null for the other profiles in the file
+	private static GeneralRouter replayRoutingProfile(XmlPullParser parser, String onlyProfile, GeneralRouter target) {
+		if (!onlyProfile.equals(parser.getAttributeValue("", "name"))) {
+			return null;
+		}
+		for (int i = 0; i < parser.getAttributeCount(); i++) {
+			target.addAttribute(parser.getAttributeName(i), parser.getAttributeValue(i));
+		}
+		target.setPrependRules(parser.getAttributeValue("", "extends") != null);
+		return target;
 	}
 
 	private static void parseRoutingParameter(XmlPullParser parser, GeneralRouter currentRouter) {
@@ -414,6 +523,9 @@ public class RoutingConfiguration {
 			boolean defaultBoolean = Boolean.parseBoolean(parser.getAttributeValue("", "default"));
 			currentRouter.registerBooleanParameter(id, Algorithms.isEmpty(group) ? null : group,
 					name, description, profiles, defaultBoolean);
+			if ("false".equals(parser.getAttributeValue("", GeneralRouter.HH_ROUTING))) {
+				currentRouter.getParameters().get(id).setHHRouting(false);
+			}
 		} else if ("numeric".equalsIgnoreCase(type)) {
 			double defaultNumeric = Algorithms.parseDoubleSilently(parser.getAttributeValue("", "default"), 0);
 			String values = parser.getAttributeValue("", "values");
