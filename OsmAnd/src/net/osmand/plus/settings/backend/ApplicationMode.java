@@ -33,6 +33,8 @@ public class ApplicationMode {
 
 	private static final List<ApplicationMode> defaultValues = new ArrayList<>();
 	private static final List<ApplicationMode> values = new ArrayList<>();
+	// Built-in profiles the build leaves out (BuildConfig.HIDDEN_APP_MODES)
+	private static final List<ApplicationMode> hiddenValues = new ArrayList<>();
 	private static List<ApplicationMode> cachedFilteredValues = new ArrayList<>();
 
 	private static StateChangedListener<String> listener;
@@ -510,6 +512,10 @@ public class ApplicationMode {
 			mode.app = app;
 			mode.updateAppModeIcon();
 		}
+		// Hidden profiles keep working as constants, e.g. for the order fix-ups below
+		for (ApplicationMode mode : hiddenValues) {
+			mode.app = app;
+		}
 
 		if (settings.APP_MODE_ORDER.isSetForMode(PUBLIC_TRANSPORT) && !settings.APP_MODE_ORDER.isSetForMode(TRAIN)) {
 			TRAIN.setOrder(PUBLIC_TRANSPORT.getOrder() + 1);
@@ -738,6 +744,8 @@ public class ApplicationMode {
 			if (!isHiddenInBuild(applicationMode.stringKey)) {
 				values.add(applicationMode);
 				defaultValues.add(applicationMode);
+			} else {
+				hiddenValues.add(applicationMode);
 			}
 			return applicationMode;
 		}
