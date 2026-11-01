@@ -635,7 +635,8 @@ public class OsmandAidlApi {
 				ApplicationMode profile = ApplicationMode.valueOfStringKey(profileStr, DEFAULT_PROFILE);
 				boolean validProfile = false;
 				for (ApplicationMode mode : VALID_PROFILES) {
-					if (mode == profile) {
+					// The build may leave a profile out (BuildConfig.HIDDEN_APP_MODES)
+					if (mode == profile && ApplicationMode.allPossibleValues().contains(mode)) {
 						validProfile = true;
 						break;
 					}
@@ -696,7 +697,8 @@ public class OsmandAidlApi {
 				ApplicationMode profile = ApplicationMode.valueOfStringKey(profileStr, DEFAULT_PROFILE);
 				boolean validProfile = false;
 				for (ApplicationMode mode : VALID_PROFILES) {
-					if (mode == profile) {
+					// The build may leave a profile out (BuildConfig.HIDDEN_APP_MODES)
+					if (mode == profile && ApplicationMode.allPossibleValues().contains(mode)) {
 						validProfile = true;
 						break;
 					}

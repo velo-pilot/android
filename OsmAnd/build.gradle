@@ -68,6 +68,8 @@ android {
 		// Map style of profiles without their own default (RendererRegistry key)
 		buildConfigField "String", "DEFAULT_RENDERER", "\"OsmAnd\""
 		buildConfigField "String", "DEFAULT_AVAILABLE_APP_MODES", "\"car,bicycle,e_bike,pedestrian,speed_pedelec,public_transport,\""
+		// Built-in profiles the app leaves out: not listed, cannot be selected or used as a base, see ApplicationMode
+		buildConfigField "String", "HIDDEN_APP_MODES", "\"\""
 	}
 
 	lintOptions {
@@ -169,6 +171,9 @@ android {
 			buildConfigField "String", "DEFAULT_APP_MODE", "\"speed_pedelec\""
 			buildConfigField "String", "DEFAULT_RENDERER", "\"VeloPilot travel\""
 			buildConfigField "String", "DEFAULT_AVAILABLE_APP_MODES", "\"bicycle,e_bike,speed_pedelec,\""
+			// Leave driving, boating, flying and skiing to OsmAnd. Android Auto stays (a phone screen on the
+			// handlebars): without a car profile it keeps the current profile, see NavigationSession
+			buildConfigField "String", "HIDDEN_APP_MODES", "\"car,truck,boat,aircraft,ski,\""
 			manifestPlaceholders = [velopilotIcon: "@mipmap/icon_velopilot"]
 		}
 		// VeloPilot dev (builds of main) and beta (pre-releases) builds: install next to the release app, with

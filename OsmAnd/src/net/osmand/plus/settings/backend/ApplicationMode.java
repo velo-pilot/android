@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import net.osmand.StateChangedListener;
+import net.osmand.plus.BuildConfig;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.profiles.ProfileIconColors;
@@ -732,9 +733,17 @@ public class ApplicationMode {
 		}
 
 		private ApplicationMode reg() {
-			values.add(applicationMode);
-			defaultValues.add(applicationMode);
+			// Built-in profiles the build leaves out stay usable as constants, but are not listed, cannot be
+			// selected and are not found by their key
+			if (!isHiddenInBuild(applicationMode.stringKey)) {
+				values.add(applicationMode);
+				defaultValues.add(applicationMode);
+			}
 			return applicationMode;
+		}
+
+		private static boolean isHiddenInBuild(@NonNull String stringKey) {
+			return Arrays.asList(BuildConfig.HIDDEN_APP_MODES.split(",")).contains(stringKey);
 		}
 
 		private ApplicationMode customReg() {
