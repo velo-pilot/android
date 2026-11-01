@@ -86,6 +86,27 @@ public class ApplicationMode {
 	public static final ApplicationMode SPEED_PEDELEC = create(BICYCLE, R.string.app_mode_speed_pedelec, "speed_pedelec")
 			.icon(R.drawable.ic_action_speed_pedelec)
 			.description(R.string.app_mode_speed_pedelec_descr).reg();
+	// Other bikes, offered under "Other bike" in the first usage wizard (RidingQuestions)
+	public static final ApplicationMode CARGO_BIKE = create(BICYCLE, R.string.app_mode_cargo_bike, "cargo_bike")
+			.icon(R.drawable.ic_action_cargo_bike)
+			.description(R.string.app_mode_cargo_bike_descr).reg();
+	public static final ApplicationMode ROAD_BIKE = create(BICYCLE, R.string.app_mode_road_bike, "road_bike")
+			.icon(R.drawable.ic_action_road_bike)
+			.description(R.string.app_mode_road_bike_descr).reg();
+	public static final ApplicationMode MOUNTAIN_BIKE = create(BICYCLE, R.string.app_mode_mountain_bike, "mountain_bike")
+			.icon(R.drawable.ic_action_mountain_bike)
+			.description(R.string.app_mode_mountain_bike_descr).reg();
+	public static final ApplicationMode VELOMOBILE = create(BICYCLE, R.string.app_mode_velomobile, "velomobile")
+			.icon(R.drawable.ic_action_velomobile)
+			.description(R.string.app_mode_velomobile_descr).reg();
+	public static final ApplicationMode TRIKE = create(BICYCLE, R.string.app_mode_trike, "trike")
+			.icon(R.drawable.ic_action_trike)
+			.description(R.string.app_mode_trike_descr).reg();
+	public static final ApplicationMode E_SCOOTER = create(BICYCLE, R.string.app_mode_e_scooter, "e_scooter")
+			.icon(R.drawable.ic_action_scooter)
+			.description(R.string.app_mode_e_scooter_descr).reg();
+	public static final List<ApplicationMode> OTHER_BIKES = Collections.unmodifiableList(
+			Arrays.asList(CARGO_BIKE, ROAD_BIKE, MOUNTAIN_BIKE, VELOMOBILE, TRIKE, E_SCOOTER));
 
 	public static final ApplicationMode PUBLIC_TRANSPORT = createBase(R.string.app_mode_public_transport, "public_transport")
 			.icon(R.drawable.ic_action_bus_dark)
@@ -536,6 +557,11 @@ public class ApplicationMode {
 		}
 		if (settings.APP_MODE_ORDER.isSetForMode(SPEED_PEDELEC) && !settings.APP_MODE_ORDER.isSetForMode(E_BIKE)) {
 			E_BIKE.setOrder(SPEED_PEDELEC.getOrder());
+		}
+		for (ApplicationMode mode : OTHER_BIKES) {
+			if (settings.APP_MODE_ORDER.isSetForMode(SPEED_PEDELEC) && !settings.APP_MODE_ORDER.isSetForMode(mode)) {
+				mode.setOrder(SPEED_PEDELEC.getOrder());
+			}
 		}
 		if (settings.APP_MODE_ORDER.isSetForMode(SKI) && !settings.APP_MODE_ORDER.isSetForMode(HORSE)) {
 			HORSE.setOrder(SKI.getOrder() + 1);

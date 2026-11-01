@@ -1,0 +1,31 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <!-- Recumbent trike or handbike: reclined seat, crank in front -->
+  <path
+      android:pathData="M2.5,17.5 A3,3 0 1,0 8.5,17.5 A3,3 0 1,0 2.5,17.5 Z"
+      android:strokeWidth="1.6"
+      android:strokeColor="#ffffff"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+  <path
+      android:pathData="M15.0,17 A3.5,3.5 0 1,0 22.0,17 A3.5,3.5 0 1,0 15.0,17 Z"
+      android:strokeWidth="1.6"
+      android:strokeColor="#ffffff"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+  <path
+      android:pathData="M5.5,17.5 L12.5,15.6 L18.5,17 M9,16.6 L3.2,12.4 M11,14.4 L14.4,14.4 L17.6,8.4"
+      android:strokeWidth="1.8"
+      android:strokeColor="#ffffff"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+  <path
+      android:pathData="M2.0,12.4 A1.2,1.2 0 1,0 4.4,12.4 A1.2,1.2 0 1,0 2.0,12.4 Z"
+      android:strokeWidth="1.4"
+      android:strokeColor="#ffffff"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+</vector>

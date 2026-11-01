@@ -37,7 +37,7 @@ enum class RidingUsage(
 
 	fun apply(app: OsmandApplication) {
 		val settings = app.settings
-		for (mode in RidingQuestions.BIKES) {
+		for (mode in RidingQuestions.ALL_BIKES) {
 			// Groups of boolean routing parameters (router_profiles/*.xml): exactly one of them is on. Parameters
 			// a profile lacks are stored but not read.
 			for (id in DRIVING_STYLES) {
@@ -59,7 +59,7 @@ enum class RidingUsage(
 
 /**
  * The first steps of the first usage wizard of cycling editions (BuildConfig.RIDING_QUESTIONS): which bike the
- * rider prefers as default profile, and what they mostly ride for. [onDone] continues to the maps step.
+ * rider prefers as default profile (the three main bikes, more under "Other bike"), and what they mostly ride for. [onDone] continues to the maps step.
  */
 class RidingQuestions(
 	private val app: OsmandApplication,
@@ -72,6 +72,8 @@ class RidingQuestions(
 		private set
 
 	private var bike = initialBike(app)
+	// The other bikes are folded into one "Other bike" row until it is tapped, or one of them is the choice
+	private var showOtherBikes = bike in ApplicationMode.OTHER_BIKES
 	private var usage = RidingUsage.TRAVEL
 
 	private val title: TextView = view.findViewById(R.id.question_title)
@@ -91,9 +93,16 @@ class RidingQuestions(
 		if (step == STEP_BIKE) {
 			title.setText(R.string.riding_questions_bike_title)
 			description.text = app.getString(R.string.riding_questions_bike_descr, appName)
-			for (mode in BIKES) {
+			for (mode in if (showOtherBikes) ALL_BIKES else BIKES) {
 				addOption(mode.iconRes, mode.toHumanString(), mode.description, mode == bike) {
 					bike = mode
+					show(STEP_BIKE)
+				}
+			}
+			if (!showOtherBikes) {
+				addOption(R.drawable.ic_action_arrow_down, app.getString(R.string.riding_questions_other_bike),
+					app.getString(R.string.riding_questions_other_bike_descr), null) {
+					showOtherBikes = true
 					show(STEP_BIKE)
 				}
 			}
@@ -131,18 +140,20 @@ class RidingQuestions(
 		settings.setApplicationMode(bike)
 	}
 
-	private fun addOption(@DrawableRes iconId: Int, title: String, description: String, selected: Boolean,
+	/** [selected] null: a row without a radio button */
+	private fun addOption(@DrawableRes iconId: Int, title: String, description: String, selected: Boolean?,
 	                      onClick: () -> Unit) {
 		val item = UiUtilities.getInflater(view.context, nightMode)
 			.inflate(R.layout.first_usage_option_item, options, false) as ViewGroup
-		val color = if (selected) ColorUtilities.getActiveColor(app, nightMode)
+		val color = if (selected == true) ColorUtilities.getActiveColor(app, nightMode)
 			else ColorUtilities.getDefaultIconColor(app, nightMode)
 		item.findViewById<ImageView>(R.id.icon).setImageDrawable(app.uiUtilities.getPaintedIcon(iconId, color))
 		item.findViewById<TextView>(R.id.title).text = title
 		item.findViewById<TextView>(R.id.description).text = description
 		val radio = item.findViewById<CompoundButton>(R.id.compound_button)
 		UiUtilities.setupCompoundButton(nightMode, ColorUtilities.getActiveColor(app, nightMode), radio)
-		radio.isChecked = selected
+		radio.isChecked = selected == true
+		radio.visibility = if (selected == null) View.INVISIBLE else View.VISIBLE
 		item.setOnClickListener { onClick() }
 		options.addView(item)
 	}
@@ -155,6 +166,10 @@ class RidingQuestions(
 		@JvmField
 		val BIKES = listOf(ApplicationMode.BICYCLE, ApplicationMode.E_BIKE, ApplicationMode.SPEED_PEDELEC)
 
+		/** [BIKES] and the bikes under "Other bike" */
+		@JvmField
+		val ALL_BIKES = BIKES + ApplicationMode.OTHER_BIKES
+
 		@JvmStatic
 		fun isNeeded(app: OsmandApplication): Boolean {
 			return BuildConfig.RIDING_QUESTIONS && !app.settings.RIDING_QUESTIONS_ANSWERED.get()
@@ -162,7 +177,7 @@ class RidingQuestions(
 
 		private fun initialBike(app: OsmandApplication): ApplicationMode {
 			val mode = app.settings.DEFAULT_APPLICATION_MODE.get()
-			return if (mode in BIKES) mode else ApplicationMode.SPEED_PEDELEC
+			return if (mode in ALL_BIKES) mode else ApplicationMode.SPEED_PEDELEC
 		}
 	}
 }

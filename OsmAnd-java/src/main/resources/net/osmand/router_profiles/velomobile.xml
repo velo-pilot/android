@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Built-in routing profile for velomobiles: fully faired recumbent trikes, as fast as a speed pedelec on the flat
+	but wide, long and low. Legally a bicycle, so it extends the bicycle profile (routing.xml and
+	router_profiles/bicycle.xml, cycle node network option included) and only adds what the shell changes:
+	  * the Width option of the bicycle profile (the app sets 0.8 m for this profile) also closes barriers with a
+	    narrower maxwidth=*; cycle barriers (staggered gates) are avoided hard, stiles, kissing gates and
+	    turnstiles, steps and kerbs are closed or avoided;
+	  * speed bumps and tables (traffic_calming=*) cost time: a velomobile has little ground clearance;
+	  * unpaved ways, sett, cobblestones and ways mapped with a bad smoothness=* are avoided about as hard as
+	    with the road bike profile.
+	Rules come before those of the bicycle profile and the first match wins, so the surface rules replace the
+	priority the bicycle profile gives these ways (cycle node network option included).
+	The precalculated (HH) routes of the maps are built for the bicycle profile, so it uses standard routing.
+-->
+<osmand_routing_config>
+
+	<routingProfile name="velomobile" extends="bicycle" defaultSpeed="30" hhRouting="false">
+
+		<way attribute="access">
+			<select value="-1" t="highway" v="steps"/>
+		</way>
+
+		<way attribute="priority">
+			<select value="0.05" t="smoothness" v="impassable"/>
+			<select value="0.05" t="smoothness" v="very_horrible"/>
+			<select value="0.05" t="smoothness" v="horrible"/>
+			<select value="0.1" t="smoothness" v="very_bad"/>
+			<select value="0.3" t="smoothness" v="bad"/>
+			<select value="0.1" t="surface" v="unhewn_cobblestone"/>
+			<select value="0.2" t="surface" v="cobblestone"/>
+			<select value="0.4" t="surface" v="sett"/>
+			<select value="0.05" t="surface" v="sand"/>
+			<select value="0.05" t="surface" v="mud"/>
+			<select value="0.05" t="surface" v="grass"/>
+			<select value="0.1" t="surface" v="dirt"/>
+			<select value="0.1" t="surface" v="earth"/>
+			<select value="0.1" t="surface" v="ground"/>
+			<select value="0.1" t="surface" v="pebblestone"/>
+			<select value="0.2" t="surface" v="gravel"/>
+			<select value="0.2" t="surface" v="unpaved"/>
+			<select value="0.4" t="surface" v="fine_gravel"/>
+			<select value="0.4" t="surface" v="compacted"/>
+			<select value="0.2" t="tracktype" v="grade5"/>
+			<select value="0.2" t="tracktype" v="grade4"/>
+			<select value="0.2" t="tracktype" v="grade3"/>
+			<select value="0.4" t="tracktype" v="grade2"/>
+		</way>
+
+		<point attribute="obstacle">
+			<select value="-1" t="maxwidth">
+				<gt value1=":width" value2="$maxwidth" type="length"/>
+			</select>
+			<select value="-1" t="barrier" v="stile"/>
+			<select value="-1" t="barrier" v="kissing_gate"/>
+			<select value="-1" t="barrier" v="turnstile"/>
+			<select value="-1" t="barrier" v="full-height_turnstile"/>
+			<select value="-1" t="barrier" v="motorcycle_barrier"/>
+			<select value="600" t="barrier" v="cycle_barrier"/>
+			<select value="60" t="barrier" v="kerb"/>
+			<select value="10" t="traffic_calming"/>
+		</point>
+
+	</routingProfile>
+</osmand_routing_config>

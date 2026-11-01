@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Built-in routing profile for mountain and gravel bikes. Extends the bicycle profile (routing.xml and
+	router_profiles/bicycle.xml, cycle node network option included) and turns its view of unpaved ways around:
+	tracks, paths and gravel, dirt and ground surfaces are preferred over minor paved roads, up to the technical limit
+	of a recreational rider (mtb:scale 0 to 2). Harder trails (mtb:scale 3 and up) and mud, sand and
+	horrible surfaces are avoided. Rules come before those of the bicycle profile and the first match wins, so
+	these rules replace the priority the bicycle profile gives these ways (cycle node network option included).
+	The precalculated (HH) routes of the maps are built for the bicycle profile, so it uses standard routing.
+-->
+<osmand_routing_config>
+
+	<routingProfile name="mountain_bike" extends="bicycle" defaultSpeed="15" hhRouting="false">
+
+		<way attribute="priority">
+			<select value="0.05" t="mtb:scale" v="6"/>
+			<select value="0.05" t="mtb:scale" v="5"/>
+			<select value="0.1" t="mtb:scale" v="4"/>
+			<select value="0.3" t="mtb:scale" v="3"/>
+			<select value="0.1" t="smoothness" v="impassable"/>
+			<select value="0.3" t="surface" v="mud"/>
+			<select value="0.4" t="surface" v="sand"/>
+			<!-- Unpaved ways and easy trails reach the speed cap of the bicycle profile, minor paved roads don't -->
+			<select value="1.5" t="mtb:scale" v="2"/>
+			<select value="1.5" t="mtb:scale" v="1"/>
+			<select value="1.5" t="mtb:scale" v="0"/>
+			<select value="1.5" t="surface" v="gravel"/>
+			<select value="1.5" t="surface" v="fine_gravel"/>
+			<select value="1.5" t="surface" v="compacted"/>
+			<select value="1.5" t="surface" v="dirt"/>
+			<select value="1.5" t="surface" v="earth"/>
+			<select value="1.5" t="surface" v="ground"/>
+			<select value="1.5" t="surface" v="unpaved"/>
+			<select value="1.3" t="surface" v="grass"/>
+			<select value="1.5" t="tracktype" v="grade2"/>
+			<select value="1.5" t="tracktype" v="grade3"/>
+			<select value="1.3" t="tracktype" v="grade4"/>
+			<select value="1.1" t="tracktype" v="grade5"/>
+			<select value="1.4" t="highway" v="track"/>
+			<select value="1.3" t="highway" v="bridleway"/>
+			<select value="1.0" t="highway" v="residential"/>
+			<select value="1.0" t="highway" v="unclassified"/>
+			<select value="1.0" t="highway" v="living_street"/>
+			<select value="1.0" t="highway" v="service"/>
+		</way>
+
+	</routingProfile>
+</osmand_routing_config>

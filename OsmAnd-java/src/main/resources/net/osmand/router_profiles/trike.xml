@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Built-in routing profile for trikes, recumbents and handbikes: three wheels or a long wheelbase, a low seat,
+	often an adapted bike for a rider with a disability. Legally a bicycle, so it extends the bicycle profile
+	(routing.xml and router_profiles/bicycle.xml, cycle node network option included) and only adds what the
+	frame changes:
+	  * the Width option of the bicycle profile (the app sets 0.8 m for this profile; "-" for a two-wheeled
+	    recumbent) also closes barriers with a narrower maxwidth=*; cycle barriers (staggered gates) are
+	    avoided hard and stiles, kissing gates and turnstiles are closed;
+	  * steps are closed and kerbs are avoided: the bike can't be lifted;
+	  * sett, cobblestones and unpaved ways cost more;
+	  * steep climbs cost more: the rider can't stand up on the pedals, a handbike is driven by the arms.
+	Rules come before those of the bicycle profile and the first match wins, so the surface rules replace the
+	priority the bicycle profile gives these ways (cycle node network option included).
+	The precalculated (HH) routes of the maps are built for the bicycle profile, so it uses standard routing.
+-->
+<osmand_routing_config>
+
+	<routingProfile name="trike" extends="bicycle" defaultSpeed="15" hhRouting="false">
+
+		<way attribute="access">
+			<select value="-1" t="highway" v="steps"/>
+		</way>
+
+		<way attribute="priority">
+			<select value="0.2" t="surface" v="unhewn_cobblestone"/>
+			<select value="0.3" t="surface" v="cobblestone"/>
+			<select value="0.5" t="surface" v="sett"/>
+			<select value="0.1" t="surface" v="sand"/>
+			<select value="0.1" t="surface" v="mud"/>
+			<select value="0.2" t="surface" v="grass"/>
+			<select value="0.3" t="surface" v="gravel"/>
+			<select value="0.3" t="surface" v="dirt"/>
+			<select value="0.3" t="surface" v="earth"/>
+			<select value="0.3" t="surface" v="ground"/>
+			<select value="0.3" t="surface" v="unpaved"/>
+			<select value="0.2" t="smoothness" v="very_bad"/>
+			<select value="0.4" t="smoothness" v="bad"/>
+		</way>
+
+		<point attribute="obstacle">
+			<select value="-1" t="maxwidth">
+				<gt value1=":width" value2="$maxwidth" type="length"/>
+			</select>
+			<select value="-1" t="barrier" v="stile"/>
+			<select value="-1" t="barrier" v="kissing_gate"/>
+			<select value="-1" t="barrier" v="turnstile"/>
+			<select value="-1" t="barrier" v="full-height_turnstile"/>
+			<select value="-1" t="barrier" v="motorcycle_barrier"/>
+			<select value="300" t="barrier" v="cycle_barrier"/>
+			<select value="60" t="barrier" v="kerb"/>
+		</point>
+
+		<!-- Seconds per metre of climb, see the bicycle profile: the same up to 7 %, then twice as much. Only
+		     uphill, only for the default relief. -->
+		<way attribute="obstacle_srtm_alt_speed">
+			<if param="height_obstacles">
+				<ifnot param="relief_smoothness_factor_more_plains">
+					<ifnot param="relief_smoothness_factor_hills">
+						<lt value1="25" value2=":incline">
+							<select value="96"/>
+						</lt>
+						<lt value1="13" value2=":incline">
+							<select value="64"/>
+						</lt>
+						<lt value1="7" value2=":incline">
+							<select value="32"/>
+						</lt>
+					</ifnot>
+				</ifnot>
+			</if>
+		</way>
+
+	</routingProfile>
+</osmand_routing_config>

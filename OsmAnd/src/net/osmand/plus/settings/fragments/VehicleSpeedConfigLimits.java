@@ -48,6 +48,12 @@ public class VehicleSpeedConfigLimits {
 				return MAX_CAR_SPEED_LIMIT;
 			case "bicycle":
 			case "e_bike":
+			case "cargo_bike":
+			case "road_bike":
+			case "mountain_bike":
+			case "velomobile":
+			case "trike":
+			case "e_scooter":
 				return MAX_BICYCLE_SPEED_LIMIT;
 			case "pedestrian":
 				return MAX_PEDESTRIAN_SPEED_LIMIT;

@@ -20,6 +20,12 @@ public enum RoutingProfilesResources {
 	MOPED(R.string.app_mode_moped, R.drawable.ic_action_motor_scooter),
 	E_BIKE(R.string.app_mode_e_bike, R.drawable.ic_action_electric_bike),
 	SPEED_PEDELEC(R.string.app_mode_speed_pedelec, R.drawable.ic_action_speed_pedelec),
+	CARGO_BIKE(R.string.app_mode_cargo_bike, R.drawable.ic_action_cargo_bike),
+	ROAD_BIKE(R.string.app_mode_road_bike, R.drawable.ic_action_road_bike),
+	MOUNTAIN_BIKE(R.string.app_mode_mountain_bike, R.drawable.ic_action_mountain_bike),
+	VELOMOBILE(R.string.app_mode_velomobile, R.drawable.ic_action_velomobile),
+	TRIKE(R.string.app_mode_trike, R.drawable.ic_action_trike),
+	E_SCOOTER(R.string.app_mode_e_scooter, R.drawable.ic_action_scooter),
 	TRAIN(R.string.app_mode_train, R.drawable.ic_action_train);
 
 	int stringRes;

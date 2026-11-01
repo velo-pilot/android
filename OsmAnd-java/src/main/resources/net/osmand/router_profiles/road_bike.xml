@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Built-in routing profile for road bikes (racefiets): fast, light, narrow high-pressure tyres. Extends the
+	bicycle profile (routing.xml and router_profiles/bicycle.xml, cycle node network option included) and only
+	changes what the tyres change: smooth asphalt wins, unpaved ways are avoided about as hard as with the
+	bicycle option "Avoid unpaved roads", and sett, cobblestones and ways mapped with a bad smoothness=* cost much
+	more. Rules come before those of the bicycle profile and the first match wins, so these rules replace the
+	priority the bicycle profile gives these ways (cycle node network option included).
+	The precalculated (HH) routes of the maps are built for the bicycle profile, so it uses standard routing.
+-->
+<osmand_routing_config>
+
+	<routingProfile name="road_bike" extends="bicycle" defaultSpeed="25" hhRouting="false">
+
+		<way attribute="priority">
+			<select value="0.05" t="smoothness" v="impassable"/>
+			<select value="0.05" t="smoothness" v="very_horrible"/>
+			<select value="0.05" t="smoothness" v="horrible"/>
+			<select value="0.1" t="smoothness" v="very_bad"/>
+			<select value="0.3" t="smoothness" v="bad"/>
+			<select value="0.1" t="surface" v="unhewn_cobblestone"/>
+			<select value="0.2" t="surface" v="cobblestone"/>
+			<select value="0.4" t="surface" v="sett"/>
+			<select value="0.05" t="surface" v="sand"/>
+			<select value="0.05" t="surface" v="mud"/>
+			<select value="0.05" t="surface" v="grass"/>
+			<select value="0.05" t="surface" v="dirt"/>
+			<select value="0.05" t="surface" v="earth"/>
+			<select value="0.05" t="surface" v="ground"/>
+			<select value="0.05" t="surface" v="pebblestone"/>
+			<select value="0.1" t="surface" v="gravel"/>
+			<select value="0.1" t="surface" v="unpaved"/>
+			<select value="0.2" t="surface" v="fine_gravel"/>
+			<select value="0.2" t="surface" v="compacted"/>
+			<select value="0.5" t="surface" v="grass_paver"/>
+			<!-- Tracks without a surface are mostly unpaved; grade1 is paved -->
+			<select value="0.1" t="tracktype" v="grade5"/>
+			<select value="0.1" t="tracktype" v="grade4"/>
+			<select value="0.1" t="tracktype" v="grade3"/>
+			<select value="0.2" t="tracktype" v="grade2"/>
+		</way>
+
+	</routingProfile>
+</osmand_routing_config>

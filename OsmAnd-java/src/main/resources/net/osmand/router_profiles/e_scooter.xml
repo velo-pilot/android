@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Built-in routing profile for electric kick scooters (e-step) up to 25 km/h. In Belgium they follow the rules
+	for cyclists (motorised personal mobility device), so the profile extends the e-bike profile (bicycle rules,
+	cycle node network option, climbs that count for less) and only changes what the small wheels change:
+	  * unpaved ways are close to unridable, sett and cobblestones and ways mapped with a bad smoothness=* are
+	    avoided hard;
+	  * kerbs and steps cost more: the scooter has to be lifted (15 to 25 kg).
+	Rules come before those of the e-bike and bicycle profiles and the first match wins, so the surface rules
+	replace the priority the bicycle profile gives these ways (cycle node network option included).
+	The precalculated (HH) routes of the maps are built for the bicycle profile, so it uses standard routing.
+-->
+<osmand_routing_config>
+
+	<routingProfile name="e_scooter" extends="e_bike" defaultSpeed="18" hhRouting="false">
+
+		<way attribute="priority">
+			<select value="0.05" t="highway" v="steps"/>
+			<select value="0.05" t="smoothness" v="impassable"/>
+			<select value="0.05" t="smoothness" v="very_horrible"/>
+			<select value="0.05" t="smoothness" v="horrible"/>
+			<select value="0.05" t="smoothness" v="very_bad"/>
+			<select value="0.2" t="smoothness" v="bad"/>
+			<select value="0.05" t="surface" v="unhewn_cobblestone"/>
+			<select value="0.1" t="surface" v="cobblestone"/>
+			<select value="0.3" t="surface" v="sett"/>
+			<select value="0.05" t="surface" v="sand"/>
+			<select value="0.05" t="surface" v="mud"/>
+			<select value="0.05" t="surface" v="grass"/>
+			<select value="0.05" t="surface" v="dirt"/>
+			<select value="0.05" t="surface" v="earth"/>
+			<select value="0.05" t="surface" v="ground"/>
+			<select value="0.05" t="surface" v="pebblestone"/>
+			<select value="0.05" t="surface" v="gravel"/>
+			<select value="0.05" t="surface" v="unpaved"/>
+			<select value="0.3" t="surface" v="fine_gravel"/>
+			<select value="0.3" t="surface" v="compacted"/>
+			<select value="0.3" t="surface" v="grass_paver"/>
+			<select value="0.05" t="tracktype" v="grade5"/>
+			<select value="0.05" t="tracktype" v="grade4"/>
+			<select value="0.05" t="tracktype" v="grade3"/>
+			<select value="0.2" t="tracktype" v="grade2"/>
+		</way>
+
+		<point attribute="obstacle">
+			<select value="30" t="barrier" v="kerb"/>
+		</point>
+
+	</routingProfile>
+</osmand_routing_config>

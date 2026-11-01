@@ -11,6 +11,22 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="riding_questions_other_bike">Other bike</string>
+	<string name="riding_questions_other_bike_descr">Cargo bike, road bike, mountain bike, velomobile, trike or e-scooter</string>
+	<string name="app_mode_cargo_bike">Cargo bike</string>
+	<string name="app_mode_cargo_bike_descr">Bakfiets, longtail or bike with a trailer. Avoids steps, narrow barriers, cobblestones and steep climbs.</string>
+	<string name="app_mode_road_bike">Road bike</string>
+	<string name="app_mode_road_bike_descr">Fast bike with narrow tyres. Keeps to smooth asphalt, avoids unpaved roads and cobblestones.</string>
+	<string name="app_mode_mountain_bike">Mountain or gravel bike</string>
+	<string name="app_mode_mountain_bike_descr">Prefers tracks, gravel and easy trails over paved roads.</string>
+	<string name="app_mode_velomobile">Velomobile</string>
+	<string name="app_mode_velomobile_descr">Faired recumbent trike. Fast on smooth roads; avoids narrow barriers, kerbs, speed bumps and unpaved roads.</string>
+	<string name="app_mode_trike">Trike or handbike</string>
+	<string name="app_mode_trike_descr">Trike, recumbent or adapted bike. Avoids steps, kerbs, narrow barriers and rough surfaces.</string>
+	<string name="app_mode_e_scooter">E-scooter</string>
+	<string name="app_mode_e_scooter_descr">Electric kick scooter up to 25 km/h. Follows bicycle rules; avoids unpaved roads, cobblestones and kerbs.</string>
+	<string name="routing_attr_electric_assist_name">Electric assistance</string>
+	<string name="routing_attr_electric_assist_description">The bike has pedal assistance: climbs count for less.</string>
 	<string name="app_mode_bicycle_descr">Bicycle without pedal assistance: city, road or mountain bike. Follows bicycle rules.</string>
 	<string name="riding_questions_step">Step %1$d of %2$d</string>
 	<string name="riding_questions_bike_title">Which bike do you ride?</string>

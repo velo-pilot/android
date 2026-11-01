@@ -38,7 +38,13 @@ public class RoutingConfiguration {
 	private static final String[] BUNDLED_ROUTING_PROFILES = {
 			"/net/osmand/router_profiles/speed_pedelec.xml",
 			"/net/osmand/router_profiles/bicycle.xml",
-			"/net/osmand/router_profiles/e_bike.xml"};
+			"/net/osmand/router_profiles/e_bike.xml",
+			"/net/osmand/router_profiles/cargo_bike.xml",
+			"/net/osmand/router_profiles/road_bike.xml",
+			"/net/osmand/router_profiles/mountain_bike.xml",
+			"/net/osmand/router_profiles/velomobile.xml",
+			"/net/osmand/router_profiles/trike.xml",
+			"/net/osmand/router_profiles/e_scooter.xml"};
 	public Map<String, String> attributes = new LinkedHashMap<String, String>();
 
 	// 1. parameters of routing and different tweaks
