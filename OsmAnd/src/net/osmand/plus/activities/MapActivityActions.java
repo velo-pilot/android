@@ -459,18 +459,20 @@ public class MapActivityActions extends MapActions {
 					R.drawable.ic_action_folder_osm_notes, DRAWER_OSM_EDITS_ID);
 		}
 
-		adapter.addItem(new ContextMenuItem(DRAWER_BACKUP_RESTORE_ID)
-				.setTitleId(R.string.backup_and_restore, activity)
-				.setIcon(R.drawable.ic_action_cloud_upload)
-				.setListener((uiAdapter, view, item, isChecked) -> {
-					app.logEvent("drawer_backup_restore_open");
-					if (app.getBackupHelper().isRegistered()) {
-						BackupCloudFragment.showInstance(activity.getSupportFragmentManager());
-					} else {
-						BackupAuthorizationFragment.showInstance(activity.getSupportFragmentManager());
-					}
-					return true;
-				}));
+		if (Version.isOsmAndPurchasesEnabled()) {
+			adapter.addItem(new ContextMenuItem(DRAWER_BACKUP_RESTORE_ID)
+					.setTitleId(R.string.backup_and_restore, activity)
+					.setIcon(R.drawable.ic_action_cloud_upload)
+					.setListener((uiAdapter, view, item, isChecked) -> {
+						app.logEvent("drawer_backup_restore_open");
+						if (app.getBackupHelper().isRegistered()) {
+							BackupCloudFragment.showInstance(activity.getSupportFragmentManager());
+						} else {
+							BackupAuthorizationFragment.showInstance(activity.getSupportFragmentManager());
+						}
+						return true;
+					}));
+		}
 
 		adapter.addItem(new ContextMenuItem(DRAWER_SEARCH_ID)
 				.setTitleId(R.string.search_button, activity)
@@ -531,13 +533,15 @@ public class MapActivityActions extends MapActions {
 					return true;
 				}));
 
-		adapter.addItem(new ContextMenuItem(DRAWER_LIVE_UPDATES_ID)
-				.setTitleId(R.string.live_updates, activity)
-				.setIcon(R.drawable.ic_action_map_update)
-				.setListener((uiAdapter, view, item, isChecked) -> {
-					LiveUpdatesFragment.showInstance(activity.getSupportFragmentManager(), null);
-					return true;
-				}));
+		if (Version.isOsmAndPurchasesEnabled()) {
+			adapter.addItem(new ContextMenuItem(DRAWER_LIVE_UPDATES_ID)
+					.setTitleId(R.string.live_updates, activity)
+					.setIcon(R.drawable.ic_action_map_update)
+					.setListener((uiAdapter, view, item, isChecked) -> {
+						LiveUpdatesFragment.showInstance(activity.getSupportFragmentManager(), null);
+						return true;
+					}));
+		}
 
 		adapter.addItem(new ContextMenuItem(DRAWER_TRAVEL_GUIDES_ID)
 				.setTitle(app.getString(R.string.ltr_or_rtl_combine_with_brackets,

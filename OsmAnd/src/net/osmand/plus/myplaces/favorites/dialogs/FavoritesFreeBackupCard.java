@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
+import net.osmand.plus.Version;
 import net.osmand.plus.inapp.InAppPurchaseUtils;
 import net.osmand.plus.myplaces.favorites.FavoriteGroup;
 import net.osmand.plus.routepreparationmenu.cards.BaseCard;
@@ -47,6 +48,6 @@ public class FavoritesFreeBackupCard extends BaseCard {
 		boolean backupAvailable = InAppPurchaseUtils.isBackupAvailable(app);
 		boolean registered = app.getBackupHelper().isRegistered();
 		boolean dismissed = app.getSettings().FAVORITES_FREE_ACCOUNT_CARD_DISMISSED.get();
-		return hasFavorites && !backupAvailable && !registered && !dismissed;
+		return hasFavorites && !backupAvailable && !registered && !dismissed && Version.isOsmAndPurchasesEnabled();
 	}
 }

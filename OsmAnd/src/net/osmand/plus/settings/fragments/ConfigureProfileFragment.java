@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.osmand.PlatformUtil;
 import net.osmand.plus.R;
+import net.osmand.plus.Version;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.backup.ui.BackupAuthorizationFragment;
 import net.osmand.plus.helpers.AndroidUiHelper;
@@ -327,7 +328,7 @@ public class ConfigureProfileFragment extends BaseSettingsFragment implements Co
 	private void setupFreeFavoritesBackupCard() {
 		boolean available = InAppPurchaseUtils.isBackupAvailable(app);
 		boolean isRegistered = app.getBackupHelper().isRegistered();
-		boolean shouldShowFreeBackupCard = !available && !isRegistered
+		boolean shouldShowFreeBackupCard = !available && !isRegistered && Version.isOsmAndPurchasesEnabled()
 				&& !app.getSettings().CONFIGURE_PROFILE_FREE_ACCOUNT_CARD_DISMISSED.get();
 		Preference freeBackupCard = findPreference("free_favorites_backup_card");
 		if (freeBackupCard != null) {

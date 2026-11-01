@@ -38,6 +38,7 @@ import net.osmand.data.LatLon;
 import net.osmand.data.PointDescription;
 import net.osmand.plus.OsmAndTaskManager;
 import net.osmand.plus.R;
+import net.osmand.plus.Version;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.activities.OsmandActionBarActivity;
 import net.osmand.plus.base.OsmandBaseExpandableListAdapter;
@@ -175,7 +176,8 @@ public class FavoritesTreeFragment extends OsmandExpandableListFragment implemen
 			View dividerView = inflater.inflate(R.layout.list_item_divider, null, false);
 			boolean available = InAppPurchaseUtils.isBackupAvailable(app);
 			boolean isRegistered = app.getBackupHelper().isRegistered();
-			if (!available && !isRegistered && !app.getSettings().FAVORITES_FREE_ACCOUNT_CARD_DISMISSED.get()) {
+			if (!available && !isRegistered && Version.isOsmAndPurchasesEnabled()
+					&& !app.getSettings().FAVORITES_FREE_ACCOUNT_CARD_DISMISSED.get()) {
 				freeFavoritesBackupCardDivider = inflater.inflate(R.layout.list_item_divider, listView, false);
 				listView.addHeaderView(freeFavoritesBackupCardDivider, null, false);
 				freeFavoritesBackupCard = inflater.inflate(R.layout.free_backup_card, listView, false);

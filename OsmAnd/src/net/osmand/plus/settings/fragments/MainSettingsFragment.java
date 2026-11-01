@@ -20,6 +20,7 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceViewHolder;
 
 import net.osmand.plus.R;
+import net.osmand.plus.Version;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.backup.ui.BackupAuthorizationFragment;
 import net.osmand.plus.backup.ui.BackupCloudFragment;
@@ -73,6 +74,7 @@ public class MainSettingsFragment extends BaseSettingsFragment implements OnSele
 		setupBackupAndRestorePref();
 		Preference purchasesSettings = requirePreference(PURCHASES_SETTINGS);
 		purchasesSettings.setIcon(getContentIcon(R.drawable.ic_action_purchases));
+		purchasesSettings.setVisible(Version.isOsmAndPurchasesEnabled());
 		PreferenceCategory selectedProfile = requirePreference(SELECTED_PROFILE);
 		selectedProfile.setIconSpaceReserved(false);
 		setupConfigureProfilePref();
@@ -191,6 +193,7 @@ public class MainSettingsFragment extends BaseSettingsFragment implements OnSele
 	private void setupBackupAndRestorePref() {
 		Preference backupSettings = findPreference(BACKUP_AND_RESTORE);
 		backupSettings.setIcon(getContentIcon(R.drawable.ic_action_cloud_upload));
+		backupSettings.setVisible(Version.isOsmAndPurchasesEnabled());
 
 		if (app.getBackupHelper().isRegistered()) {
 			String time = getLastBackupTimeDescription(app, "");

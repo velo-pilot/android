@@ -74,6 +74,15 @@ public class InAppPurchaseUtils {
 		return isOsmAndProPurchased(app) || isPromoSubscribed(app) || checkDeveloperBuildIfNeeded(app, checkDevBuild);
 	}
 
+	/**
+	 * Builds that do not sell OsmAnd Pro (see {@link Version#isOsmAndPurchasesEnabled()}) unlock the Pro features
+	 * that run on the device. The OsmAnd services Pro pays for (OsmAnd Cloud, weather, Live updates) stay locked
+	 * there and their screens are hidden.
+	 */
+	public static boolean isProUnlocked() {
+		return !Version.isOsmAndPurchasesEnabled();
+	}
+
 	private static boolean checkDeveloperBuildIfNeeded(@NonNull OsmandApplication app, boolean shouldCheck) {
 		return shouldCheck && Version.isDeveloperBuild(app);
 	}
@@ -107,7 +116,7 @@ public class InAppPurchaseUtils {
 	}
 
 	public static boolean isVehicleMetricsAvailable(@NonNull OsmandApplication app) {
-		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app);
+		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app) || isProUnlocked();
 	}
 
 	public static boolean isAstronomyAvailable(@NonNull OsmandApplication app) {
@@ -115,11 +124,11 @@ public class InAppPurchaseUtils {
 	}
 
 	public static boolean isProWidgetsAvailable(@NonNull OsmandApplication app) {
-		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app);
+		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app) || isProUnlocked();
 	}
 
 	public static boolean is3dMapsAvailable(@NonNull OsmandApplication app) {
-		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app);
+		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app) || isProUnlocked();
 	}
 
 	public static boolean isExportTypeAvailable(@NonNull OsmandApplication app,
@@ -136,7 +145,7 @@ public class InAppPurchaseUtils {
 	}
 
 	public static boolean isColoringTypeAvailable(@NonNull OsmandApplication app) {
-		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app);
+		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app) || isProUnlocked();
 	}
 
 	public static boolean isBrandPromoAvailable(@NonNull OsmandApplication app) {
@@ -166,7 +175,7 @@ public class InAppPurchaseUtils {
 	}
 
 	public static boolean isGradientEditorAvailable(@NonNull OsmandApplication app) {
-		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app);
+		return isOsmAndProAvailable(app) || isBrandPromoAvailable(app) || isProUnlocked();
 	}
 
 	public static boolean isAndroidAutoAvailable(@NonNull OsmandApplication app) {
@@ -236,6 +245,6 @@ public class InAppPurchaseUtils {
 	}
 
 	public static boolean isOrganizeByTypeApplicable(OsmandApplication app, OrganizeByType organizeByType) {
-		return organizeByType == null || isOsmAndProAvailable(app) || !organizeByType.isPro();
+		return organizeByType == null || isOsmAndProAvailable(app) || isProUnlocked() || !organizeByType.isPro();
 	}
 }

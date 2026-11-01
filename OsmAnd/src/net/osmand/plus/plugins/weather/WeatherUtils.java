@@ -26,7 +26,9 @@ public class WeatherUtils {
 	}
 
 	public static boolean isWeatherSupported(@NonNull OsmandApplication app) {
-		return app.getSettings().USE_OPENGL_RENDER.get() && Version.isOpenGlAvailable(app);
+		// The forecasts come from OsmAnd's servers, for OsmAnd Pro
+		return Version.isOsmAndPurchasesEnabled()
+				&& app.getSettings().USE_OPENGL_RENDER.get() && Version.isOpenGlAvailable(app);
 	}
 
 	@NonNull

@@ -37,6 +37,7 @@ import net.osmand.map.OsmandRegions;
 import net.osmand.plus.OsmAndTaskManager;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
+import net.osmand.plus.Version;
 import net.osmand.plus.base.BaseNestedListFragment;
 import net.osmand.plus.download.DownloadActivity;
 import net.osmand.plus.download.DownloadIndexesThread.DownloadEvents;
@@ -174,7 +175,9 @@ public class UpdatesIndexFragment extends BaseNestedListFragment implements Down
 
 	private List<LocalIndexItem> prepareData(List<DownloadItem> downloadItems) {
 		List<LocalIndexItem> newLocalIndexItems = new ArrayList<>();
-		newLocalIndexItems.add(LocalIndexItem.createBannerItem());
+		if (Version.isOsmAndPurchasesEnabled()) {
+			newLocalIndexItems.add(LocalIndexItem.createBannerItem());
+		}
 		DownloadResources downloadIndexes = app.getDownloadThread().getIndexes();
 		int deprecatedMapsCount = downloadIndexes.getOutdatedItems().deprecated().size();
 		if (deprecatedMapsCount > 0) {

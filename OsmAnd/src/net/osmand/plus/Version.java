@@ -63,7 +63,16 @@ public class Version {
 	}
 
 	public static boolean isInAppPurchaseSupported() {
-		return isGooglePlayEnabled() || isHuawei() || isAmazon() || isHMDBuild();
+		return isOsmAndPurchasesEnabled() && (isGooglePlayEnabled() || isHuawei() || isAmazon() || isHMDBuild());
+	}
+
+	/**
+	 * Whether the app sells OsmAnd Pro and offers the OsmAnd services it pays for: OsmAnd Cloud, weather and Live
+	 * updates. Builds without it (VeloPilot) get the Pro features that run on the device for free, see
+	 * {@link InAppPurchaseUtils#isProUnlocked()}, and hide those services and the purchase screens.
+	 */
+	public static boolean isOsmAndPurchasesEnabled() {
+		return net.osmand.plus.BuildConfig.OSMAND_PURCHASES;
 	}
 
 	public static boolean isGooglePlayInstalled(@NonNull OsmandApplication app) {

@@ -13,6 +13,7 @@ import net.osmand.data.LatLon;
 import net.osmand.map.OsmandRegions;
 import net.osmand.map.WorldRegion;
 import net.osmand.plus.OsmandApplication;
+import net.osmand.plus.Version;
 import net.osmand.plus.inapp.InAppPurchaseUtils;
 import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.plugins.custom.CustomRegion;
@@ -288,6 +289,10 @@ public class DownloadResources extends DownloadResourceGroup {
 			}
 			if (type == DownloadActivityType.STAR_MAP_FILE) {
 				astronomyMaps.addItem(item);
+				continue;
+			}
+			if (type == DownloadActivityType.WEATHER_FORECAST && !Version.isOsmAndPurchasesEnabled()) {
+				// Weather forecasts are part of OsmAnd Pro, see WeatherUtils.isWeatherSupported
 				continue;
 			}
 			if (type == DownloadActivityType.HILLSHADE_FILE || type == DownloadActivityType.SLOPE_FILE) {

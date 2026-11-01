@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import net.osmand.plus.R;
+import net.osmand.plus.Version;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.InsetTarget;
 import net.osmand.plus.utils.InsetTargetsCollection;
@@ -28,10 +29,12 @@ public class FirstUsageActionsBottomSheet extends BaseFirstUsageBottomSheet {
 
 	@Override
 	protected void setupItems(@NonNull ViewGroup container) {
-		container.addView(createItemView(getString(R.string.restore_from_osmand_cloud), R.drawable.ic_action_restore, view -> {
-			processActionClick(RESTORE_FROM_CLOUD);
-			dismiss();
-		}));
+		if (Version.isOsmAndPurchasesEnabled()) {
+			container.addView(createItemView(getString(R.string.restore_from_osmand_cloud), R.drawable.ic_action_restore, view -> {
+				processActionClick(RESTORE_FROM_CLOUD);
+				dismiss();
+			}));
+		}
 		container.addView(createItemView(getString(R.string.restore_from_file), R.drawable.ic_action_read_from_file, view -> {
 			processActionClick(RESTORE_FROM_FILE);
 			dismiss();

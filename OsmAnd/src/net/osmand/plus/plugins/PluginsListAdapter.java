@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import net.osmand.aidl.ConnectedApp;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
+import net.osmand.plus.Version;
+import net.osmand.plus.plugins.weather.WeatherPlugin;
 import net.osmand.plus.utils.AndroidUtils;
 import net.osmand.plus.utils.UiUtilities;
 
@@ -40,6 +42,11 @@ class PluginsListAdapter extends ArrayAdapter<Object> {
 
 		for (Iterator<OsmandPlugin> iterator = visiblePlugins.iterator(); iterator.hasNext(); ) {
 			OsmandPlugin plugin = iterator.next();
+			if (plugin instanceof WeatherPlugin && !Version.isOsmAndPurchasesEnabled()) {
+				// Its forecasts come from OsmAnd's servers, for OsmAnd Pro
+				iterator.remove();
+				continue;
+			}
 			for (ConnectedApp app : connectedApps) {
 				if (plugin.getId().equals(app.getPack())) {
 					iterator.remove();

@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
+import net.osmand.plus.Version;
 import net.osmand.plus.helpers.DiscountHelper;
 import net.osmand.plus.inapp.InAppPurchaseUtils;
 import net.osmand.plus.routepreparationmenu.cards.BaseCard;
@@ -120,6 +121,6 @@ public class TracksFreeBackupCard extends BaseCard {
 		boolean hasTracks = !Algorithms.isEmpty(rootFolder.getFlattenedTrackItems());
 		boolean backupAvailable = InAppPurchaseUtils.isBackupAvailable(app);
 		boolean dismissed = app.getSettings().TRACKS_FREE_ACCOUNT_CARD_DISMISSED.get();
-		return hasTracks && !backupAvailable && !dismissed;
+		return hasTracks && !backupAvailable && !dismissed && Version.isOsmAndPurchasesEnabled();
 	}
 }

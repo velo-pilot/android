@@ -100,6 +100,9 @@ public class DiscountHelper {
 	private static final String FEATURE_NAUTICAL = "nautical";
 
 	public static void checkAndDisplay(MapActivity mapActivity) {
+		if (!Version.isOsmAndPurchasesEnabled()) {
+			return;
+		}
 		OsmandApplication app = mapActivity.getApp();
 		OsmandSettings settings = app.getSettings();
 		boolean forceShowDiscountBottomSheet = settings.SHOULD_SHOW_DISCOUNT_BOTTOM_SHEET.get();
@@ -397,7 +400,7 @@ public class DiscountHelper {
 	}
 
 	public static boolean shouldShowCurrentSaleInDrawer(@NonNull OsmandApplication app) {
-		return hasCurrentSale() && !Version.isPaidVersion(app);
+		return hasCurrentSale() && !Version.isPaidVersion(app) && Version.isOsmAndPurchasesEnabled();
 	}
 
 	@DrawableRes
