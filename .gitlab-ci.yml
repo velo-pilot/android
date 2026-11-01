@@ -1,8 +1,8 @@
 # VeloPilot: builds the APK and publishes releases in the F-Droid repository on cdn.osmpedelec.be.
 # The runner, the CI/CD variables and the release steps are described under "Releases" in build-container/README.md.
 #
-# Branch pipelines: apk:debug (manual) builds a debug APK; on the default branch, release:tag (manual) tags the
-# commit as the next release vX.Y.Z.
+# Branch pipelines: apk:debug (manual) builds a debug APK of VeloPilot Dev (be.velopilot.dev); on the default branch,
+# release:tag (manual) tags the commit as the next release vX.Y.Z.
 # Tag pipelines (vX.Y.Z): apk:release builds the signed APK, fdroid:publish adds it to the repository.
 
 workflow:
@@ -56,7 +56,7 @@ apk:debug:
       when: manual
       allow_failure: true
   script:
-    - build-container/ci/build-apk.sh assembleVelopilotOpenglArm64Debug
+    - build-container/ci/build-apk.sh assembleVelopilotDevOpenglArm64Debug
   artifacts:
     paths:
       - apk/

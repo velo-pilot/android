@@ -10,13 +10,14 @@ The first run builds the image (JDK 17 and the Android SDK packages from `versio
 [OsmAnd-resources](https://github.com/osmandapp/OsmAnd-resources) next to this repository (the build reads
 `../resources`) and fills the Gradle cache in `~/.cache/osmand-builder`. Later runs reuse all three.
 
-The default task, `assembleVelopilotOpenglArm64Debug`, writes
-`OsmAnd/build/outputs/apk/velopilotOpenglArm64/debug/OsmAnd-velopilot-opengl-arm64-debug.apk`.
-It installs as a separate app, "VeloPilot" (`be.velopilot.app`), next to OsmAnd, and is
-signed with `keystores/debug.keystore`, so newer builds install over older ones:
+The default task, `assembleVelopilotDevOpenglArm64Debug`, writes
+`OsmAnd/build/outputs/apk/velopilotDevOpenglArm64/debug/OsmAnd-velopilotDev-opengl-arm64-debug.apk`.
+It installs as "VeloPilot Dev" (`be.velopilot.dev`), next to OsmAnd and next to the VeloPilot release app
+(`be.velopilot.app`, flavour `velopilot`), and is signed with `keystores/debug.keystore`, so newer builds
+install over older ones:
 
 ```sh
-adb install -r OsmAnd/build/outputs/apk/velopilotOpenglArm64/debug/*.apk
+adb install -r OsmAnd/build/outputs/apk/velopilotDevOpenglArm64/debug/*.apk
 ```
 
 To use the maps of the OsmAnd app instead of downloading them again: in OsmAnd, set *Settings > OsmAnd
@@ -29,9 +30,10 @@ On the first start, when OsmAnd is installed, the download button of the welcome
 (`SharedMapsPrompt`); VeloPilot restarts once the access is allowed or the maps are moved.
 
 VeloPilot's own resources are in `OsmAnd/res-velopilot`: launcher icon, splash logo, accent colours (the blue
-of the logo) and the Xmind UI font. `branding/generate.py` makes the images and the font files from
-`branding/velopilot.svg` and `branding/fonts/` (needs Inkscape, ImageMagick, fontTools and the Xmind font
-installed); run it after changing those. The build writes the strings that mention OsmAnd, in all languages,
+of the logo) and the Xmind UI font. The dev builds use them too, with their own launcher icon from
+`OsmAnd/res-velopilot-dev` (an α instead of the P). `branding/generate.py` makes the images and the font
+files from `branding/velopilot.svg`, `branding/velopilot-dev.svg` and `branding/fonts/` (needs Inkscape,
+ImageMagick, fontTools and the Xmind font installed); run it after changing those. The build writes the strings that mention OsmAnd, in all languages,
 with VeloPilot instead (`generateVelopilotStrings` in `OsmAnd/build.gradle`); OsmAnd's services (OsmAnd Cloud,
 Live, Pro) and the OsmAnd app whose maps VeloPilot uses keep their name.
 
@@ -39,7 +41,8 @@ Live, Pro) and the OsmAnd app whose maps VeloPilot uses keep their name.
 access to the OsmAnd maps.
 
 Other tasks and Gradle arguments go on the command line, for example
-`build-container/build-apk.sh assembleVelopilotOpenglFatDebug` for all ABIs, or
+`build-container/build-apk.sh assembleVelopilotDevOpenglFatDebug` for all ABIs,
+`build-container/build-apk.sh assembleVelopilotOpenglArm64Debug` for a debug build of the release app, or
 `build-container/build-apk.sh :OsmAnd-java:test` to run the Java tests. `build-container/build-apk.sh shell`
 opens a shell in the build container.
 
@@ -129,5 +132,6 @@ Protected variables only reach pipelines of protected branches and tags, so prot
 default) and the release tags: Settings > Repository > Protected tags, `v*`, allowed to create: Maintainers.
 release:tag creates the tag with `RELEASE_TOKEN`, because the job's own token cannot create tags.
 
-Release builds are signed with a different key than the debug builds, so switching from a debug build to a
-release means uninstalling the debug build first.
+Release builds are signed with a different key than the debug builds. Debug builds of VeloPilot Dev install
+next to the release app; switching from a debug build of the release flavour (`assembleVelopilotOpenglArm64Debug`)
+to a release means uninstalling the debug build first.

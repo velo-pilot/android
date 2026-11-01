@@ -14,7 +14,7 @@
     </queries>
 
     <application
-        android:icon="@mipmap/icon_velopilot"
+        android:icon="${velopilotIcon}"
         tools:replace="android:icon">
 
         <provider
