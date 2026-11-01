@@ -1,0 +1,40 @@
+# Builds a VeloPilot APK into apk/: JDK 17, the Android SDK packages from versions.gradle, OsmAnd-resources next to
+# the checkout, then build-container/ci/build-apk.sh. The caller sets APK_VERSION, APK_NUMBER_VERSION and, for
+# release builds, APK_KEYSTORE_BASE64 and APK_KEY_PASSWORD in the step's env.
+name: Build a VeloPilot APK
+description: Builds a VeloPilot APK with Gradle into apk/
+inputs:
+  task:
+    description: Gradle task, e.g. assembleVelopilotDevOpenglArm64Release
+    required: true
+runs:
+  using: composite
+  steps:
+    # The Android SDK, Gradle caches and the build outputs don't fit in the runner's free disk space otherwise
+    - name: Free disk space
+      shell: bash
+      run: sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
+
+    - uses: gradle/actions/setup-gradle@v4
+
+    # Kotlin/Native toolchain of the multiplatform OsmAnd-shared module
+    - uses: actions/cache@v4
+      with:
+        path: ~/.konan
+        key: konan-${{ runner.os }}-${{ hashFiles('build.gradle', 'OsmAnd-shared/build.gradle.kts') }}
+        restore-keys: konan-${{ runner.os }}-
+
+    - name: Prepare the Android SDK and OsmAnd-resources
+      shell: bash
+      env:
+        CACHE_ROOT: ${{ runner.temp }}
+      run: build-container/ci/prepare-android.sh
+
+    - name: Build ${{ inputs.task }}
+      shell: bash
+      run: build-container/ci/build-apk.sh ${{ inputs.task }}

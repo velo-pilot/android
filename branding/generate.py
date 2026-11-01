@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generates the VeloPilot launcher icon, splash logo, F-Droid icon and UI font.
 
-The images come from velopilot.svg, the launcher and F-Droid icon of the dev builds (flavour velopilotDev,
-res-velopilot-dev) from velopilot-dev.svg, and the font resources from the variable font in fonts/ (Xmind, SIL OFL
+The images come from velopilot.svg, the launcher and F-Droid icons of the dev and beta builds (flavours
+velopilotDev and velopilotBeta, res-velopilot-dev and res-velopilot-beta) from velopilot-dev.svg and
+velopilot-beta.svg, and the font resources from the variable font in fonts/ (Xmind, SIL OFL
 1.1, see fonts/OFL.txt): Android before 8 cannot pick a weight from a variable font, so the app gets static
 instances of the weights it uses. Needs Inkscape, ImageMagick, fontTools and the Xmind font installed (for
 the "P" and the "VeloPilot" text, which become paths). Run it again after changing an SVG:
@@ -18,11 +19,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "branding" / "velopilot.svg"
-DEV_SOURCE = ROOT / "branding" / "velopilot-dev.svg"
 RES = ROOT / "OsmAnd" / "res-velopilot"
-DEV_RES = ROOT / "OsmAnd" / "res-velopilot-dev"
 FDROID_ICON = ROOT / "build-container" / "fdroid" / "icon.png"
-FDROID_DEV_ICON = ROOT / "build-container" / "fdroid" / "icon-dev.png"
+# The dev and beta builds: their own launcher and F-Droid icon, the rest from res-velopilot
+VARIANTS = ["dev", "beta"]
 VARIABLE_FONT = ROOT / "branding" / "fonts" / "Xmind_VariableFont_wght.ttf"
 FONT_WEIGHTS = {400: "regular", 500: "medium", 700: "bold"}
 
@@ -176,12 +176,21 @@ def png(src, dst, width, height=None):
 	run("magick", str(dst), "-strip", str(dst))
 
 
-def bitmaps(plain, dev_plain, tmp):
+def variant_icons(variant, tmp):
+	source = ROOT / "branding" / f"velopilot-{variant}.svg"
+	res = ROOT / "OsmAnd" / f"res-velopilot-{variant}"
+	plain = tmp / f"velopilot-{variant}-plain.svg"
+	text_to_path(source, plain)
+	launcher_icon(plain, source, res, f"velopilot_{variant}")
+	for density, factor in DENSITIES.items():
+		png(plain, res / f"mipmap-{density}" / f"icon_velopilot_{variant}.png", round(48 * factor))
+	png(plain, FDROID_ICON.with_name(f"icon-{variant}.png"), 512)
+
+
+def bitmaps(plain, tmp):
 	for density, factor in DENSITIES.items():
 		png(plain, RES / f"mipmap-{density}" / "icon_velopilot.png", round(48 * factor))
-		png(dev_plain, DEV_RES / f"mipmap-{density}" / "icon_velopilot_dev.png", round(48 * factor))
 	png(plain, FDROID_ICON, 512)
-	png(dev_plain, FDROID_DEV_ICON, 512)
 
 	# Splash logo: the icon with rounded corners, centred on a transparent canvas
 	for density, factor in DENSITIES.items():
@@ -260,11 +269,10 @@ def main():
 		tmp = Path(tmp)
 		plain = tmp / "velopilot-plain.svg"
 		text_to_path(SOURCE, plain)
-		dev_plain = tmp / "velopilot-dev-plain.svg"
-		text_to_path(DEV_SOURCE, dev_plain)
 		launcher_icon(plain, SOURCE, RES, "velopilot")
-		launcher_icon(dev_plain, DEV_SOURCE, DEV_RES, "velopilot_dev")
-		bitmaps(plain, dev_plain, tmp)
+		bitmaps(plain, tmp)
+		for variant in VARIANTS:
+			variant_icons(variant, tmp)
 		splash_text(tmp)
 	fonts()
 

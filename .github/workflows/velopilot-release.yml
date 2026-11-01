@@ -1,0 +1,61 @@
+# Releases VeloPilot from main, by hand (Actions > VeloPilot release > Run workflow):
+# - beta: VeloPilot Beta (be.velopilot.beta) as GitHub pre-release vX.Y.Z-beta.N of the next release, which
+#   velo-pilot/fdroid adds to the beta F-Droid repository (cdn.velopilot.be/fdroid-beta/repo)
+# - release: VeloPilot (be.velopilot.app) as GitHub release vX.Y.Z; publish it in the F-Droid release repository
+#   (cdn.velopilot.be/fdroid/repo) with release.sh in velo-pilot/fdroid
+# See build-container/README.md.
+#
+# The job runs in the "release" environment, which only main may use. Its secrets (APK_KEYSTORE_BASE64,
+# APK_KEY_PASSWORD: the release signing key; FDROID_DISPATCH_TOKEN) are managed by OpenTofu in velo-pilot/fdroid.
+
+name: VeloPilot release
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Beta (pre-release) or release
+        type: choice
+        options: [beta, release]
+        default: beta
+      version:
+        description: Version, e.g. 0.2.0 (default the last release with its patch number one up)
+        type: string
+        required: false
+      notes:
+        description: Release notes (default the commits since the previous release or beta)
+        type: string
+        required: false
+
+concurrency:
+  group: velopilot-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'velo-pilot/android'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Version and release notes
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_NOTES: ${{ inputs.notes }}
+        run: build-container/ci/next-release.sh "${{ inputs.channel }}" >> "$GITHUB_ENV"
+
+      - uses: ./.github/actions/velopilot-apk
+        with:
+          task: ${{ inputs.channel == 'beta' && 'assembleVelopilotBetaOpenglArm64Release' || 'assembleVelopilotOpenglArm64Release' }}
+        env:
+          APK_KEYSTORE_BASE64: ${{ secrets.APK_KEYSTORE_BASE64 }}
+          APK_KEY_PASSWORD: ${{ secrets.APK_KEY_PASSWORD }}
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FDROID_DISPATCH_TOKEN: ${{ secrets.FDROID_DISPATCH_TOKEN }}
+        run: build-container/ci/publish-release.sh "${{ inputs.channel }}"

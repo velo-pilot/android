@@ -123,6 +123,12 @@ android {
 			// The VeloPilot branding, plus the launcher icon of the dev builds
 			res.srcDirs = ["res-velopilot", "res-velopilot-dev"]
 		}
+		velopilotBeta {
+			java.srcDirs = ["src-google", "src-osmand"]
+			manifest.srcFile "AndroidManifest-velopilot.xml"
+			// The VeloPilot branding, plus the launcher icon of the beta builds
+			res.srcDirs = ["res-velopilot", "res-velopilot-beta"]
+		}
 		huawei {
 			java.srcDirs = ["src-huawei"]
 			manifest.srcFile "AndroidManifest-huawei.xml"
@@ -165,13 +171,21 @@ android {
 			buildConfigField "String", "DEFAULT_AVAILABLE_APP_MODES", "\"bicycle,e_bike,speed_pedelec,\""
 			manifestPlaceholders = [velopilotIcon: "@mipmap/icon_velopilot"]
 		}
-		// VeloPilot dev builds: install next to the release app, with their own launcher icon
+		// VeloPilot dev (builds of main) and beta (pre-releases) builds: install next to the release app, with
+		// their own launcher icon
 		velopilotDev {
 			initWith productFlavors.velopilot
 			dimension "version"
 			applicationId "be.velopilot.dev"
 			resValue "string", "app_name", "VeloPilot Dev"
 			manifestPlaceholders = [velopilotIcon: "@mipmap/icon_velopilot_dev"]
+		}
+		velopilotBeta {
+			initWith productFlavors.velopilot
+			dimension "version"
+			applicationId "be.velopilot.beta"
+			resValue "string", "app_name", "VeloPilot Beta"
+			manifestPlaceholders = [velopilotIcon: "@mipmap/icon_velopilot_beta"]
 		}
 		androidFull {
 			dimension "version"
@@ -414,7 +428,7 @@ def generateVelopilotStrings = tasks.register('generateVelopilotStrings', Genera
 }
 
 androidComponents {
-	["velopilot", "velopilotDev"].each { flavor ->
+	["velopilot", "velopilotDev", "velopilotBeta"].each { flavor ->
 		onVariants(selector().withFlavor(new kotlin.Pair("version", flavor))) { variant ->
 			variant.sources.res.addGeneratedSourceDirectory(generateVelopilotStrings, { it.outputDir })
 		}

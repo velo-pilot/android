@@ -1,27 +1,24 @@
 #!/usr/bin/env bash
-# Runs a Gradle APK task in GitLab CI, after prepare-android.sh.
+# Runs a Gradle APK task in CI (.github/actions/velopilot-apk), after prepare-android.sh.
 #
 #   build-container/ci/build-apk.sh TASK
 #
-# In a tag pipeline, the release tag sets versionName and versionCode (see version.sh), and the APK is signed
-# with the key in APK_KEYSTORE_BASE64 (base64 of the PKCS12 keystore), APK_KEY_ALIAS and APK_KEY_PASSWORD.
-# The APK is copied to apk/.
+# APK_VERSION and APK_NUMBER_VERSION set versionName and versionCode (next-release.sh works them out). Release
+# builds are signed with the key in APK_KEYSTORE_BASE64 (base64 of the PKCS12 keystore), APK_KEY_ALIAS and
+# APK_KEY_PASSWORD. The APK is copied to apk/.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
-. build-container/ci/version.sh
 TASK=$1
 
-if [ -n "${CI_COMMIT_TAG:-}" ]; then
-	APK_NUMBER_VERSION=$(release_version_code "$CI_COMMIT_TAG")
-	export APK_NUMBER_VERSION APK_VERSION=${CI_COMMIT_TAG#v}
-	echo ">> $APK_VERSION, versionCode $APK_NUMBER_VERSION"
+if [ -n "${APK_VERSION:-}" ]; then
+	echo ">> $APK_VERSION, versionCode ${APK_NUMBER_VERSION:?}"
 fi
-export APP_EDITION=${CI_COMMIT_TIMESTAMP%%T*}
+export APP_EDITION=${APP_EDITION:-$(git log -1 --format=%cs)}
 case "$TASK" in
 	*Release)
 		if [ -z "${APK_KEYSTORE_BASE64:-}" ] || [ -z "${APK_KEY_PASSWORD:-}" ]; then
-			echo "APK_KEYSTORE_BASE64 and APK_KEY_PASSWORD are not set; they are protected variables, so the" \
-				"tag must be protected too" >&2
+			echo "APK_KEYSTORE_BASE64 and APK_KEY_PASSWORD are not set; they are secrets of the workflow's" \
+				"environment, which only main may use" >&2
 			exit 1
 		fi
 		export OSMAND_APK_KEYSTORE=/tmp/apk-signing.p12

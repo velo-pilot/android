@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Prepares a GitLab CI job for the Gradle build, in the eclipse-temurin image of build-container/Containerfile:
-# installs the Android SDK packages from versions.gradle in $ANDROID_HOME and puts OsmAnd-resources next to
-# the checkout, where the build reads it. Both live in $CACHE_ROOT, so later jobs on the runner reuse them.
+# Prepares a CI job for the Gradle build (.github/actions/velopilot-apk): installs the Android SDK packages from
+# versions.gradle in $ANDROID_HOME and puts OsmAnd-resources (in $CACHE_ROOT) next to the checkout, where the build
+# reads it.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 

@@ -1,0 +1,44 @@
+# Builds VeloPilot Dev (be.velopilot.dev) from every push to main and publishes it as a GitHub pre-release
+# vX.Y.Z-dev.RUN, which velo-pilot/fdroid adds to the dev F-Droid repository (cdn.velopilot.be/fdroid-dev/repo).
+# See build-container/README.md.
+#
+# The job runs in the "dev" environment, which only main may use. Its secrets (APK_KEYSTORE_BASE64,
+# APK_KEY_PASSWORD: the dev signing key; FDROID_DISPATCH_TOKEN) are managed by OpenTofu in velo-pilot/fdroid.
+
+name: VeloPilot dev build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer push makes the build of an older one pointless
+concurrency:
+  group: velopilot-dev
+  cancel-in-progress: true
+
+jobs:
+  dev:
+    if: github.repository == 'velo-pilot/android'
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Version
+        run: build-container/ci/next-release.sh dev >> "$GITHUB_ENV"
+
+      - uses: ./.github/actions/velopilot-apk
+        with:
+          task: assembleVelopilotDevOpenglArm64Release
+        env:
+          APK_KEYSTORE_BASE64: ${{ secrets.APK_KEYSTORE_BASE64 }}
+          APK_KEY_PASSWORD: ${{ secrets.APK_KEY_PASSWORD }}
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FDROID_DISPATCH_TOKEN: ${{ secrets.FDROID_DISPATCH_TOKEN }}
+        run: build-container/ci/publish-release.sh dev

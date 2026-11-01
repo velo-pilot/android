@@ -30,9 +30,9 @@ On the first start, when OsmAnd is installed, the download button of the welcome
 (`SharedMapsPrompt`); VeloPilot restarts once the access is allowed or the maps are moved.
 
 VeloPilot's own resources are in `OsmAnd/res-velopilot`: launcher icon, splash logo, accent colours (the blue
-of the logo) and the Xmind UI font. The dev builds use them too, with their own launcher icon from
-`OsmAnd/res-velopilot-dev` (an α instead of the P). `branding/generate.py` makes the images and the font
-files from `branding/velopilot.svg`, `branding/velopilot-dev.svg` and `branding/fonts/` (needs Inkscape,
+of the logo) and the Xmind UI font. The dev and beta builds use them too, with their own launcher icon from
+`OsmAnd/res-velopilot-dev` (an α instead of the P) and `OsmAnd/res-velopilot-beta` (a β). `branding/generate.py`
+makes the images and the font files from `branding/velopilot*.svg` and `branding/fonts/` (needs Inkscape,
 ImageMagick, fontTools and the Xmind font installed); run it after changing those. The build writes the strings that mention OsmAnd, in all languages,
 with VeloPilot instead (`generateVelopilotStrings` in `OsmAnd/build.gradle`); OsmAnd's services (OsmAnd Cloud,
 Live, Pro) and the OsmAnd app whose maps VeloPilot uses keep their name.
@@ -63,75 +63,36 @@ The OpenGL flavours take the native core from the prebuilt `OsmAndCore_android` 
 builder.osmand.net. The legacy native library (`libosmand.so`) needs the Android NDK and the OsmAnd-core-legacy
 sources, which this image does not include; without it the app uses its Java router.
 
-## Releases on cdn.osmpedelec.be
+## Builds and releases (GitHub Actions)
 
-GitLab CI (`.gitlab-ci.yml`) builds the releases and publishes them in an F-Droid repository at
-<https://cdn.osmpedelec.be/fdroid/repo>, a Bunny CDN pull zone in front of a Bunny Storage zone. Users add that
-repository with its fingerprint to F-Droid, Droid-ify, Neo Store or Obtainium and get updates from there.
+VeloPilot comes as three apps, which install next to each other (and next to OsmAnd), each with its own F-Droid
+repository on cdn.velopilot.be:
 
-### Releasing
+| App | Flavour | Built | GitHub release | F-Droid repository |
+|---|---|---|---|---|
+| VeloPilot Dev, `be.velopilot.dev` (α icon) | `velopilotDev` | every push to main | pre-release `vX.Y.Z-dev.RUN` | <https://cdn.velopilot.be/fdroid-dev/repo> |
+| VeloPilot Beta, `be.velopilot.beta` (β icon) | `velopilotBeta` | by hand | pre-release `vX.Y.Z-beta.N` | <https://cdn.velopilot.be/fdroid-beta/repo> |
+| VeloPilot, `be.velopilot.app` | `velopilot` | by hand | release `vX.Y.Z` | <https://cdn.velopilot.be/fdroid/repo> |
 
-1. On the default branch, run the manual job **release:tag** (Build > Pipelines, or the pipeline of the latest
-   commit). It tags the commit as the next release. VeloPilot has its own version, independent of OsmAnd's:
-   tags `vMAJOR.MINOR.PATCH` with versionCode MAJOR × 10000 + MINOR × 100 + PATCH (`v0.1.0` is 100, `v1.2.3`
-   is 10203), so MINOR and PATCH stay below 100. The first release takes the versionName of the velopilot
-   flavour in `OsmAnd/build.gradle` (0.1.0), later ones raise the patch number; set `RELEASE_VERSION` (e.g.
-   `0.2.0`) in the job's "Run" form for another version. The tag message is the release notes: the subjects
-   of the commits since the last release that are not on `master`, or `RELEASE_NOTES` when you set it.
-2. The tag starts the release pipeline:
-   - **apk:release** builds `assembleVelopilotOpenglArm64Release`, signed with the release key;
-   - **fdroid:publish** downloads the published APKs from the storage zone, adds the new one and keeps the
-     newest three (`KEEP_RELEASES`), writes the metadata from `fdroid/metadata/be.velopilot.app.yml` with the
-     release notes of each version's tag, runs `fdroid update` to sign a new index and uploads the repository:
-     new files first, the index last, then it deletes the removed APKs and purges `cdn.osmpedelec.be/fdroid/*`
-     from the CDN cache. The job log ends with the link to add the repository.
+The workflows build release APKs (minified, signed) with `.github/actions/velopilot-apk` and publish each as a
+GitHub release with exactly one APK; [velo-pilot/fdroid](https://github.com/velo-pilot/fdroid) turns those into
+the F-Droid repositories. Version numbers are in `build-container/ci/version.sh`: VeloPilot has its own version,
+independent of OsmAnd's. Releases `vMAJOR.MINOR.PATCH` get versionCode MAJOR × 10000 + MINOR × 100 + PATCH, betas
+`vX.Y.Z-beta.N` of the next release that release's versionCode × 100 + N, dev builds the run number of the dev
+workflow.
 
-A tag pushed from a local checkout (`git tag -a v0.3.0 -m "notes"`, then `git push <gitlab remote> v0.3.0`)
-starts the same pipeline. To publish a release
-again, retry its fdroid:publish job. To withdraw one, delete its APK from the storage zone and retry the
-fdroid:publish job of the newest remaining release (or the whole pipeline once its APK artifact has expired).
+- **Dev builds**: `.github/workflows/velopilot-dev.yml` builds every push to main as `vX.Y.Z-dev.RUN` (X.Y.Z is
+  the next release), with the subjects of the pushed commits as notes, keeps the newest 5 and asks velo-pilot/fdroid
+  to update its dev repository.
+- **Betas and releases**: run *Actions > VeloPilot release > Run workflow* on main and pick beta or release. The
+  version defaults to the last release with its patch number one up (the first release takes the versionName of the
+  velopilot flavour in `OsmAnd/build.gradle`), the notes to the subjects of the commits on main since the previous
+  release or beta (F-Droid shows up to 500 characters). A beta goes to the beta repository right away; publish a
+  release in the F-Droid release repository with `./release.sh` in velo-pilot/fdroid, which takes that repository's
+  key out of Bitwarden.
 
-On other branches, the manual job **apk:debug** builds a debug APK and keeps it as a job artifact for a week.
-
-### Runner
-
-The jobs run on a runner with the tag `osmpedelec`, so they never land on the instance runners, which have too
-little memory for this build. Register a runner with the docker executor on a machine with at least 12 GB of
-memory for the project (Settings > CI/CD > Runners > New project runner, tag `osmpedelec`). Keep the default
-`volumes = ["/cache"]` in its `config.toml`: the jobs keep the Android SDK, the Gradle and Kotlin/Native caches
-and OsmAnd-resources in `/cache/osmpedelec` (`CACHE_ROOT`), so only the first build downloads them. The jobs
-use public images (eclipse-temurin, Debian with fdroidserver from its packages, buildpack-deps) and need no
-privileged mode.
-
-### Keys and variables
-
-Once, create the keys locally:
-
-```sh
-build-container/release.sh init
-```
-
-This writes `apk-signing.p12` (signs the APK; Android only installs an update signed with the same key),
-`fdroid-repo.p12` (signs the repository index; its fingerprint is what users check) and their passwords to
-`~/.local/share/velopilot-release`, and prints the CI/CD variables for them. Back that folder up.
-`build-container/release.sh variables` prints the variables again, `build-container/release.sh fingerprint`
-the repository fingerprint and the link to add the repository.
-
-CI/CD variables (Settings > CI/CD > Variables), all Protected and Masked:
-
-| Variable | |
-|---|---|
-| `APK_KEYSTORE_BASE64`, `APK_KEY_PASSWORD` | APK signing key, from `release.sh variables` |
-| `FDROID_KEYSTORE_BASE64`, `FDROID_KEYSTORE_PASSWORD` | repository key, from `release.sh variables` |
-| `BUNNY_STORAGE_ZONE`, `BUNNY_STORAGE_PASSWORD` | Storage > zone > FTP & API Access in the Bunny dashboard |
-| `BUNNY_STORAGE_HOST` | that page's hostname, if the zone's main region is not Falkenstein (`storage.bunnycdn.com`) |
-| `BUNNY_API_KEY` | Account settings > API key; optional, purges the cached index after an upload |
-| `RELEASE_TOKEN` | project access token with role Maintainer and scope `api`, for release:tag |
-
-Protected variables only reach pipelines of protected branches and tags, so protect the default branch (it is by
-default) and the release tags: Settings > Repository > Protected tags, `v*`, allowed to create: Maintainers.
-release:tag creates the tag with `RELEASE_TOKEN`, because the job's own token cannot create tags.
-
-Release builds are signed with a different key than the debug builds. Debug builds of VeloPilot Dev install
-next to the release app; switching from a debug build of the release flavour (`assembleVelopilotOpenglArm64Debug`)
-to a release means uninstalling the debug build first.
+The jobs run in the GitHub environments `dev` (dev signing key) and `release` (release signing key, for betas and
+releases), which only main may use. Their secrets (`APK_KEYSTORE_BASE64`, `APK_KEY_PASSWORD`,
+`FDROID_DISPATCH_TOKEN`) are managed by OpenTofu in velo-pilot/fdroid (`infra/`), where `infra/apk-key.sh` created
+the keys. Release builds are signed with other keys than the local debug builds, so switching from a debug build to
+a build from F-Droid means uninstalling the debug build first.
