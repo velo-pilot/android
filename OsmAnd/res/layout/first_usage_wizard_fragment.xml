@@ -65,100 +65,190 @@
 			</androidx.constraintlayout.widget.ConstraintLayout>
 
 			<TextView
-				android:id="@+id/wizard_description"
+				android:id="@+id/step_label"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_margin="@dimen/content_padding"
-				android:text="@string/first_usage_wizard_desc"
-				android:textColor="?android:attr/textColorPrimary"
-				android:textSize="@dimen/default_list_text_size" />
-
-			<View
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:background="?attr/list_divider" />
+				android:layout_marginHorizontal="@dimen/content_padding"
+				android:textColor="?android:textColorSecondary"
+				android:textSize="@dimen/default_desc_text_size"
+				android:visibility="gone"
+				android:layout_marginBottom="@dimen/content_padding_small"
+				tools:text="Step 1 of 3"
+				tools:visibility="visible" />
 
 			<LinearLayout
-				android:id="@+id/wizard_card"
+				android:id="@+id/questions_container"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:paddingBottom="@dimen/content_padding_small_half"
-				android:layout_marginBottom="@dimen/content_padding_small_half_inverted"
-				android:orientation="vertical">
+				android:orientation="vertical"
+				android:visibility="gone">
+
+				<net.osmand.plus.widgets.TextViewEx
+					android:id="@+id/question_title"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginHorizontal="@dimen/content_padding"
+					android:layout_marginTop="@dimen/content_padding_small"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/dialog_header_text_size"
+					app:typefaceWeight="medium"
+					tools:text="@string/riding_questions_bike_title" />
+
+				<TextView
+					android:id="@+id/question_description"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_margin="@dimen/content_padding"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/default_list_text_size"
+					tools:text="@string/riding_questions_bike_descr" />
+
+				<View
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="?attr/list_divider" />
 
 				<LinearLayout
-					android:id="@+id/wizard_layout"
+					android:id="@+id/question_options"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:background="?attr/selectableItemBackground"
-					android:minHeight="48dp"
-					android:orientation="horizontal">
+					android:orientation="vertical" />
 
-					<ProgressBar
-						android:id="@+id/wizard_progress_bar_icon"
-						android:layout_width="54dp"
-						android:layout_height="60dp"
-						android:indeterminate="true"
-						android:padding="10dp"
-						android:visibility="gone" />
-
-					<androidx.appcompat.widget.AppCompatImageView
-						android:id="@+id/wizard_icon"
-						android:layout_width="54dp"
-						android:layout_height="60dp"
-						android:scaleType="center"
-						android:tint="?attr/default_icon_color"
-						app:srcCompat="@drawable/ic_map" />
-
-					<LinearLayout
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_weight="1"
-						android:orientation="vertical">
-
-						<TextView
-							android:id="@+id/wizard_title"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:gravity="center_vertical"
-							android:textColor="?android:attr/textColorPrimary"
-							android:textSize="@dimen/default_list_text_size"
-							tools:text="The Netherlands" />
-
-
-						<ProgressBar
-							android:id="@+id/wizard_progress_bar"
-							style="?android:attr/progressBarStyleHorizontal"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/content_padding_small_half"
-							android:visibility="visible" />
-
-
-					</LinearLayout>
-
-					<ImageButton
-						android:id="@+id/location_button"
-						style="@style/Widget.AppCompat.ActionButton"
-						android:layout_width="48dp"
-						android:layout_height="48dp"
-						android:layout_gravity="center"
-						android:contentDescription="@string/shared_string_location"
-						app:tint="?attr/default_icon_color"
-						app:srcCompat="@drawable/ic_action_my_location" />
-
-				</LinearLayout>
-
-				<net.osmand.plus.widgets.dialogbutton.DialogButton
-					android:id="@+id/wizard_action_button"
+				<LinearLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_marginHorizontal="@dimen/content_padding"
-					android:gravity="center"
-					app:dialogButtonHeight="@dimen/setting_list_item_small_height"
-					tools:dialogButtonType="secondary"
-					tools:dialogButtonTitle="@string/shared_string_download"/>
+					android:layout_marginTop="@dimen/content_padding_small"
+					android:orientation="horizontal">
+
+					<net.osmand.plus.widgets.dialogbutton.DialogButton
+						android:id="@+id/question_back_button"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_marginEnd="@dimen/content_padding_small"
+						android:layout_weight="1"
+						app:dialogButtonHeight="@dimen/setting_list_item_small_height"
+						app:dialogButtonTitle="@string/shared_string_back"
+						app:dialogButtonType="secondary" />
+
+					<net.osmand.plus.widgets.dialogbutton.DialogButton
+						android:id="@+id/question_next_button"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						app:dialogButtonHeight="@dimen/setting_list_item_small_height"
+						app:dialogButtonTitle="@string/shared_string_next"
+						app:dialogButtonType="primary" />
+
+				</LinearLayout>
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/maps_container"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
+				<TextView
+					android:id="@+id/wizard_description"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_margin="@dimen/content_padding"
+					android:text="@string/first_usage_wizard_desc"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/default_list_text_size" />
+
+				<View
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="?attr/list_divider" />
+
+				<LinearLayout
+					android:id="@+id/wizard_card"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:paddingBottom="@dimen/content_padding_small_half"
+					android:layout_marginBottom="@dimen/content_padding_small_half_inverted"
+					android:orientation="vertical">
+
+					<LinearLayout
+						android:id="@+id/wizard_layout"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:background="?attr/selectableItemBackground"
+						android:minHeight="48dp"
+						android:orientation="horizontal">
+
+						<ProgressBar
+							android:id="@+id/wizard_progress_bar_icon"
+							android:layout_width="54dp"
+							android:layout_height="60dp"
+							android:indeterminate="true"
+							android:padding="10dp"
+							android:visibility="gone" />
+
+						<androidx.appcompat.widget.AppCompatImageView
+							android:id="@+id/wizard_icon"
+							android:layout_width="54dp"
+							android:layout_height="60dp"
+							android:scaleType="center"
+							android:tint="?attr/default_icon_color"
+							app:srcCompat="@drawable/ic_map" />
+
+						<LinearLayout
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_weight="1"
+							android:orientation="vertical">
+
+							<TextView
+								android:id="@+id/wizard_title"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:gravity="center_vertical"
+								android:textColor="?android:attr/textColorPrimary"
+								android:textSize="@dimen/default_list_text_size"
+								tools:text="The Netherlands" />
+
+
+							<ProgressBar
+								android:id="@+id/wizard_progress_bar"
+								style="?android:attr/progressBarStyleHorizontal"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:layout_marginTop="@dimen/content_padding_small_half"
+								android:visibility="visible" />
+
+
+						</LinearLayout>
+
+						<ImageButton
+							android:id="@+id/location_button"
+							style="@style/Widget.AppCompat.ActionButton"
+							android:layout_width="48dp"
+							android:layout_height="48dp"
+							android:layout_gravity="center"
+							android:contentDescription="@string/shared_string_location"
+							app:tint="?attr/default_icon_color"
+							app:srcCompat="@drawable/ic_action_my_location" />
+
+					</LinearLayout>
+
+					<net.osmand.plus.widgets.dialogbutton.DialogButton
+						android:id="@+id/wizard_action_button"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginHorizontal="@dimen/content_padding"
+						android:gravity="center"
+						app:dialogButtonHeight="@dimen/setting_list_item_small_height"
+						tools:dialogButtonType="secondary"
+						tools:dialogButtonTitle="@string/shared_string_download"/>
+
+				</LinearLayout>
+
+				<include layout="@layout/first_usage_shared_maps_card" />
 
 			</LinearLayout>
 

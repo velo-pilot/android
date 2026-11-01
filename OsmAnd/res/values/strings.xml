@@ -11,6 +11,27 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="app_mode_bicycle_descr">Bicycle without pedal assistance: city, road or mountain bike. Follows bicycle rules.</string>
+	<string name="riding_questions_step">Step %1$d of %2$d</string>
+	<string name="riding_questions_bike_title">Which bike do you ride?</string>
+	<string name="riding_questions_bike_descr">%1$s starts with this bike. You can switch at any time from the profile button on the map.</string>
+	<string name="riding_questions_usage_title">What do you mostly ride for?</string>
+	<string name="riding_questions_usage_descr">This sets the route choice and map style of all your bikes. You can change both later in the route settings and Configure map.</string>
+	<string name="riding_usage_travel">Getting somewhere</string>
+	<string name="riding_usage_travel_descr">Commuting and errands: direct routes, cycle highways stand out on the map.</string>
+	<string name="riding_usage_leisure">Riding for pleasure</string>
+	<string name="riding_usage_leisure_descr">Day trips: cycle node networks and quiet roads, recreational routes stand out on the map.</string>
+	<string name="riding_usage_sport">Sport and training</string>
+	<string name="riding_usage_sport_descr">Fast rides: the roadway wherever it is legal and faster.</string>
+	<string name="shared_osmand_maps_setup_title">Use your OsmAnd maps</string>
+	<string name="shared_osmand_maps_setup_descr">OsmAnd is on this phone. %1$s can use the maps you downloaded there, so you don\'t need them twice. It takes two steps:</string>
+	<string name="shared_osmand_maps_step_access">Let %1$s read OsmAnd\'s maps</string>
+	<string name="shared_osmand_maps_step_access_descr">Android calls this “Install unknown apps”. It is the only way to read another app\'s maps; %1$s never installs anything.</string>
+	<string name="shared_osmand_maps_step_storage">Put the maps where %1$s can find them</string>
+	<string name="shared_osmand_maps_step_storage_descr">In OsmAnd: Menu › Settings › OsmAnd settings › Main storage. Choose Multiuser storage, then Move to the new destination. Come back here when it is done.</string>
+	<string name="shared_osmand_maps_download_instead">Download maps instead</string>
+	<string name="shared_osmand_maps_in_use_title">Your OsmAnd maps are ready</string>
+	<string name="shared_osmand_maps_in_use_descr">%1$s uses %2$d maps from OsmAnd. Add or update maps in OsmAnd; %1$s picks them up the next time it starts.</string>
 	<string name="routing_attr_driving_style_leisure_name">Leisure</string>
 	<string name="routing_attr_driving_style_leisure_description">Slower but nicer: signposted cycle routes, cycle paths and quiet roads, away from main roads.</string>
 	<string name="cycle_network_nodes">Cycle network nodes</string>
@@ -24,10 +45,6 @@
 	<string name="routing_attr_node_network_prefer_description">Prefer the cycle node network and other signposted cycle routes, with a small detour if needed.</string>
 	<string name="routing_attr_node_network_strict_name">Stay on the network</string>
 	<string name="routing_attr_node_network_strict_description">Leave the cycle node network only to reach the start or destination, or where it has a gap.</string>
-	<string name="shared_osmand_maps_prompt_title">Use your OsmAnd maps?</string>
-	<string name="shared_osmand_maps_prompt_no_access">OsmAnd is on this phone, so %1$s can use its maps instead of downloading them again.\n\nTap Allow access, turn on the switch and come back. %1$s only reads the maps; it never installs apps.</string>
-	<string name="shared_osmand_maps_prompt_move_title">Move your OsmAnd maps</string>
-	<string name="shared_osmand_maps_prompt_not_found">%1$s can\'t see the maps of OsmAnd yet. Tap Open OsmAnd, then:\n\n1. Go to Menu › Settings › OsmAnd settings › Main storage.\n2. Choose Multiuser storage, then Move to the new destination.\n3. When the maps are moved, come back to %1$s.</string>
 	<string name="shared_osmand_maps_restart">Restart %1$s to load the maps of OsmAnd.</string>
 	<string name="shared_osmand_maps_allow_access">Allow access</string>
 	<string name="shared_osmand_maps_open_osmand">Open OsmAnd</string>

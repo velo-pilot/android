@@ -64,7 +64,7 @@ public class ApplicationMode {
 
 	public static final ApplicationMode BICYCLE = createBase(R.string.app_mode_bicycle, "bicycle")
 			.icon(R.drawable.ic_action_bicycle_dark)
-			.description(R.string.base_profile_descr_bicycle).reg();
+			.description(R.string.app_mode_bicycle_descr).reg();
 
 	public static final ApplicationMode PEDESTRIAN = createBase(R.string.app_mode_pedestrian, "pedestrian")
 			.icon(R.drawable.ic_action_pedestrian_dark)

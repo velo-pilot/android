@@ -84,10 +84,15 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 	public static final int FIRST_USAGE_LOCATION_PERMISSION = 300;
 	private static final int NO_MAP_ZOOM_LEVEL = 9;
 	private static final int DOWNLOAD_MAP_ZOOM_LEVEL = 13;
+	private static final String QUESTION_STEP_KEY = "question_step";
 
 	private DownloadIndexesThread downloadThread;
 	private DownloadValidationManager validationManager;
-	private SharedMapsPrompt sharedMapsPrompt;
+	private SharedMapsCard sharedMapsCard;
+	@Nullable
+	private RidingQuestions ridingQuestions;
+	private boolean questionsShown;
+	private boolean closePending;
 
 	private View view;
 
@@ -126,7 +131,6 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 		super.onCreate(savedInstanceState);
 		downloadThread = app.getDownloadThread();
 		validationManager = new DownloadValidationManager(app);
-		sharedMapsPrompt = new SharedMapsPrompt(app);
 		if (wizardType == null) {
 			wizardType = DEFAULT_WIZARD_TYPE;
 		}
@@ -158,7 +162,83 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 		updateWizardView();
 		updateTermsOfServiceView();
 
+		sharedMapsCard = new SharedMapsCard(app, activity, view, deviceNightMode, this::goToMap, this::onDownloadInstead);
+		if (RidingQuestions.isNeeded(app)) {
+			ridingQuestions = new RidingQuestions(app, view, deviceNightMode, this::showMapsStep);
+			int step = savedInstanceState != null
+					? savedInstanceState.getInt(QUESTION_STEP_KEY, RidingQuestions.STEP_BIKE)
+					: RidingQuestions.STEP_BIKE;
+			showQuestions(step);
+		} else {
+			showMapsStep();
+		}
+
 		return view;
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		if (ridingQuestions != null && questionsShown) {
+			outState.putInt(QUESTION_STEP_KEY, ridingQuestions.getStep());
+		}
+	}
+
+	private void showQuestions(int step) {
+		questionsShown = true;
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.questions_container), true);
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.maps_container), false);
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.step_label), true);
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.terms_of_service_description), false);
+		ridingQuestions.show(step);
+		updateSkipButton();
+	}
+
+	private void showMapsStep() {
+		questionsShown = false;
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.questions_container), false);
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.maps_container), true);
+		TextView stepLabel = view.findViewById(R.id.step_label);
+		AndroidUiHelper.updateVisibility(stepLabel, ridingQuestions != null);
+		stepLabel.setText(getString(R.string.riding_questions_step, 3, 3));
+		updateMapsStep();
+		if (closePending && !sharedMapsCard.isShown()) {
+			closeWizard();
+		}
+	}
+
+	/** Shows the maps of an installed OsmAnd app, or the steps to use them, in place of a map download. */
+	private void updateMapsStep() {
+		sharedMapsCard.update();
+		boolean download = !sharedMapsCard.isShown();
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.wizard_description), download);
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.wizard_card), download);
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.terms_of_service_description), download);
+		updateSkipButton();
+	}
+
+	private void onDownloadInstead() {
+		updateMapsStep();
+		if (closePending) {
+			closeWizard();
+		}
+	}
+
+	private void goToMap() {
+		if (location != null) {
+			showOnMap(new LatLon(location.getLatitude(), location.getLongitude()));
+		} else {
+			closeWizard();
+		}
+	}
+
+	/** Closes the wizard when no map can be offered, unless the rider is busy with it. */
+	private void closeWizardWhenIdle() {
+		if (questionsShown || (sharedMapsCard != null && sharedMapsCard.isShown())) {
+			closePending = true;
+		} else {
+			closeWizard();
+		}
 	}
 
 	private void updateWizardView() {
@@ -219,13 +299,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 					wizardButton.setButtonType(DialogButtonType.PRIMARY);
 					wizardButton.setTitle(getString(R.string.shared_string_download) + " " + mapIndexItem.getSizeDescription(getContext()));
 
-					wizardButton.setOnClickListener(view -> {
-						if (sharedMapsPrompt.isNeeded()) {
-							sharedMapsPrompt.show(activity, deviceNightMode, this::downloadFoundMap);
-						} else {
-							downloadFoundMap();
-						}
-					});
+					wizardButton.setOnClickListener(view -> downloadFoundMap());
 				}
 				break;
 			case MAP_DOWNLOAD:
@@ -282,7 +356,11 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 
 	private void updateSkipButton() {
 		AppCompatButton skipButton = view.findViewById(R.id.skip_button);
-		if ((wizardType == WizardType.MAP_DOWNLOAD || wizardType == WizardType.MAP_DOWNLOADED) && mapIndexItem != null) {
+		boolean sharedMapsInUse = sharedMapsCard != null && sharedMapsCard.isInUse();
+		AndroidUiHelper.updateVisibility(skipButton, !questionsShown && !sharedMapsInUse);
+		if (sharedMapsCard != null && sharedMapsCard.isShown()) {
+			skipButton.setText(getString(R.string.shared_string_skip));
+		} else if ((wizardType == WizardType.MAP_DOWNLOAD || wizardType == WizardType.MAP_DOWNLOADED) && mapIndexItem != null) {
 			skipButton.setText(getString(R.string.shared_string_continue));
 		} else {
 			skipButton.setText(getString(R.string.skip_download));
@@ -291,13 +369,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 
 	private void setupSkipButton() {
 		AppCompatButton skipButton = view.findViewById(R.id.skip_button);
-		skipButton.setOnClickListener(v -> {
-			if (location != null) {
-				showOnMap(new LatLon(location.getLatitude(), location.getLongitude()));
-			} else {
-				closeWizard();
-			}
-		});
+		skipButton.setOnClickListener(v -> goToMap());
 		updateSkipButton();
 	}
 
@@ -434,7 +506,10 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 		MapActivity activity = getMapActivity();
 		if (activity != null) {
 			activity.disableDrawer();
-			sharedMapsPrompt.onResume(activity);
+			if (!questionsShown) {
+				sharedMapsCard.onResume();
+				updateMapsStep();
+			}
 		}
 	}
 
@@ -590,7 +665,7 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 			if (mapIndexItem != null) {
 				showMapFoundWizard(true);
 			} else {
-				closeWizard();
+				closeWizardWhenIdle();
 			}
 
 		} else {
@@ -620,7 +695,8 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 
 	private void setProperZoom() {
 		int zoom;
-		if (app.getResourceManager().isAnyMapInstalled() || (mapIndexItem != null && app.getDownloadThread().isDownloading(mapIndexItem))) {
+		if (app.getResourceManager().isAnyMapInstalled() || (sharedMapsCard != null && sharedMapsCard.isInUse())
+				|| (mapIndexItem != null && app.getDownloadThread().isDownloading(mapIndexItem))) {
 			zoom = DOWNLOAD_MAP_ZOOM_LEVEL;
 		} else {
 			zoom = NO_MAP_ZOOM_LEVEL;

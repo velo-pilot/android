@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/shared_maps_card"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:paddingTop="@dimen/content_padding"
+	android:visibility="gone"
+	tools:visibility="visible">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center_vertical"
+		android:orientation="horizontal"
+		android:paddingHorizontal="@dimen/content_padding">
+
+		<androidx.appcompat.widget.AppCompatImageView
+			android:id="@+id/shared_maps_icon"
+			android:layout_width="@dimen/standard_icon_size"
+			android:layout_height="@dimen/standard_icon_size"
+			android:layout_marginEnd="@dimen/content_padding"
+			tools:src="@drawable/ic_map" />
+
+		<net.osmand.plus.widgets.TextViewEx
+			android:id="@+id/shared_maps_title"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:textAppearance="@style/TextAppearance.ListItemTitle"
+			android:textColor="?android:textColorPrimary"
+			app:typefaceWeight="medium"
+			tools:text="@string/shared_osmand_maps_setup_title" />
+
+	</LinearLayout>
+
+	<TextView
+		android:id="@+id/shared_maps_description"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/content_padding"
+		android:layout_marginTop="@dimen/content_padding_small"
+		android:textColor="?android:textColorPrimary"
+		android:textSize="@dimen/default_list_text_size"
+		tools:text="@string/shared_osmand_maps_setup_descr" />
+
+	<include
+		android:id="@+id/shared_maps_step_access"
+		layout="@layout/first_usage_shared_maps_step" />
+
+	<include
+		android:id="@+id/shared_maps_step_storage"
+		layout="@layout/first_usage_shared_maps_step" />
+
+	<net.osmand.plus.widgets.dialogbutton.DialogButton
+		android:id="@+id/shared_maps_go_button"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/content_padding"
+		app:dialogButtonTopMargin="@dimen/content_padding"
+		app:dialogButtonHeight="@dimen/setting_list_item_small_height"
+		app:dialogButtonTitle="@string/go_to_map"
+		app:dialogButtonType="primary" />
+
+	<net.osmand.plus.widgets.dialogbutton.DialogButton
+		android:id="@+id/shared_maps_download_button"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/content_padding"
+		app:dialogButtonTopMargin="@dimen/content_padding_small"
+		app:dialogButtonHeight="@dimen/setting_list_item_small_height"
+		app:dialogButtonTitle="@string/shared_osmand_maps_download_instead"
+		app:dialogButtonType="tertiary" />
+
+</LinearLayout>
