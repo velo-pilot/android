@@ -200,7 +200,10 @@ public class FirstUsageWizardFragment extends BaseFullScreenFragment implements 
 		AndroidUiHelper.updateVisibility(view.findViewById(R.id.maps_container), true);
 		TextView stepLabel = view.findViewById(R.id.step_label);
 		AndroidUiHelper.updateVisibility(stepLabel, ridingQuestions != null);
-		stepLabel.setText(getString(R.string.riding_questions_step, 3, 3));
+		if (ridingQuestions != null) {
+			int steps = ridingQuestions.getTotalSteps();
+			stepLabel.setText(getString(R.string.riding_questions_step, steps, steps));
+		}
 		updateMapsStep();
 		if (closePending && !sharedMapsCard.isShown()) {
 			closeWizard();

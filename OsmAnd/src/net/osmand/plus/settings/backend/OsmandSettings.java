@@ -1279,6 +1279,14 @@ public class OsmandSettings {
 	public final OsmandPreference<Float> FUEL_TANK_CAPACITY = new FloatPreference(this,
 			"fuel_tank_capacity", OBDDataComputer.DEFAULT_FUEL_TANK_CAPACITY).makeProfile();
 
+	// the user's bikes and their batteries (JSON of BikeGarage); a battery can be used by several bikes
+	public final OsmandPreference<String> BIKE_GARAGE = new StringPreference(this,
+			"bike_garage", "").makeGlobal().makeShared();
+
+	// id of the bike chosen with the bike button on the map
+	public final OsmandPreference<String> SELECTED_BIKE = new StringPreference(this,
+			"selected_bike", "").makeGlobal().makeShared();
+
 
 	// cache of metrics constants as they are used very often
 	public final OsmandPreference<RelativeDirectionStyle> DIRECTION_STYLE = new EnumStringPreference<RelativeDirectionStyle>(this,

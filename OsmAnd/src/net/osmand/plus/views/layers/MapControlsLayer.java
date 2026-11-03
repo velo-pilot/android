@@ -137,6 +137,7 @@ public class MapControlsLayer extends OsmandMapLayer {
 		LayoutInflater inflater = UiUtilities.getInflater(activity, nightMode);
 
 		addMapButton(createMapButton(inflater, R.layout.configure_map_button));
+		addMapButton(createMapButton(inflater, R.layout.map_bike_button));
 		addMapButton(createMapButton(inflater, R.layout.map_search_button));
 		addMapButton(createMapButton(inflater, R.layout.map_compass_button));
 

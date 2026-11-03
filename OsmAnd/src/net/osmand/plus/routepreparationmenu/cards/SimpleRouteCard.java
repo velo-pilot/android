@@ -14,14 +14,18 @@ import static net.osmand.plus.utils.OsmAndFormatter.getFormattedDistanceValue;
 import static net.osmand.plus.utils.OsmAndFormatter.getFormattedDuration;
 import static net.osmand.plus.utils.OsmAndFormatter.getFormattedTimeShort;
 
+import android.content.res.ColorStateList;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 
 import com.github.mikephil.charting.charts.ElevationChart;
 import com.github.mikephil.charting.data.LineData;
@@ -29,6 +33,8 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
+import net.osmand.plus.bikes.BikeHelper;
+import net.osmand.plus.bikes.BikeHelper.BikeEstimate;
 import net.osmand.plus.charts.ChartUtils;
 import net.osmand.plus.charts.ElevationChartAppearance;
 import net.osmand.plus.charts.GPXDataSetType;
@@ -45,6 +51,7 @@ import net.osmand.plus.widgets.dialogbutton.DialogButton;
 import net.osmand.plus.widgets.style.CustomTypefaceSpan;
 import net.osmand.shared.gpx.GpxFile;
 import net.osmand.shared.gpx.GpxTrackAnalysis;
+import net.osmand.shared.vehicle.battery.BatteryEstimate;
 import net.osmand.util.Algorithms;
 
 import java.util.ArrayList;
@@ -95,6 +102,24 @@ public class SimpleRouteCard extends MapBaseCard {
 		AndroidUiHelper.updateVisibility(view.findViewById(R.id.uphill_container), hasElevationData);
 		AndroidUiHelper.updateVisibility(view.findViewById(R.id.downhill_container), hasElevationData);
 		setupEmission();
+		setupBattery(analysis);
+	}
+
+	private void setupBattery(@NonNull GpxTrackAnalysis analysis) {
+		BikeHelper helper = new BikeHelper(app);
+		double climb = analysis.hasElevationData() ? analysis.getDiffElevationUp() : 0;
+		BikeEstimate bikeEstimate = helper.getEstimate(routingHelper.getAppMode(), routingHelper.getLeftDistance(), climb);
+		if (bikeEstimate != null) {
+			BatteryEstimate estimate = bikeEstimate.getEstimate();
+			boolean notEnough = estimate.getHasBatteries() && !estimate.isEnough();
+			int color = notEnough ? ContextCompat.getColor(app, R.color.color_warning) : getSecondaryTextColor(app, nightMode);
+			TextView textView = view.findViewById(R.id.battery);
+			textView.setText(helper.formatEstimate(bikeEstimate));
+			textView.setTextColor(color);
+			ImageView icon = view.findViewById(R.id.battery_icon);
+			ImageViewCompat.setImageTintList(icon, ColorStateList.valueOf(notEnough ? color : getSecondaryIconColor(app, nightMode)));
+		}
+		AndroidUiHelper.updateVisibility(view.findViewById(R.id.battery_container), bikeEstimate != null);
 	}
 
 	private void setupEmission() {

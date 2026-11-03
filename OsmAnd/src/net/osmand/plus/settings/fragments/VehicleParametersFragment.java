@@ -6,6 +6,7 @@ import static net.osmand.router.GeneralRouter.*;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,8 @@ import androidx.preference.PreferenceViewHolder;
 
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
+import net.osmand.plus.bikes.BikeDialogs;
+import net.osmand.plus.bikes.BikeHelper;
 import net.osmand.plus.routing.RouteService;
 import net.osmand.plus.routing.RoutingHelperUtils;
 import net.osmand.plus.settings.backend.ApplicationMode;
@@ -37,7 +40,11 @@ import net.osmand.plus.utils.OsmAndFormatter;
 import net.osmand.router.GeneralRouter;
 import net.osmand.shared.settings.enums.MetricsConstants;
 import net.osmand.shared.routing.GeneralRouterProfile;
+import net.osmand.shared.vehicle.battery.Bike;
+import net.osmand.shared.vehicle.battery.BikeGarage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class VehicleParametersFragment extends BaseSettingsFragment {
@@ -48,6 +55,7 @@ public class VehicleParametersFragment extends BaseSettingsFragment {
 	private static final String ROUTING_PARAMETER_SYMBOLIC_DEFAULT = "-";
 
 	private static final String MOTOR_TYPE_PREF_ID = ROUTING_PREFERENCE_PREFIX + MOTOR_TYPE;
+	private static final String BIKES_PREF_ID = "bikes";
 
 	@Override
 	protected void setupPreferences() {
@@ -92,6 +100,12 @@ public class VehicleParametersFragment extends BaseSettingsFragment {
 	}
 
 	private void showFuelCategory(@NonNull Map<String, RoutingParameter> parameters, @Nullable GeneralRouterProfile routerProfile) {
+		if (BikeHelper.isBatteryMode(getSelectedAppMode())) {
+			// bikes have batteries instead of a fuel tank (the speed pedelec routes as a moped); batteries
+			// belong to the bikes, and there can be several bikes of this type
+			showBikesCategory();
+			return;
+		}
 		boolean showFuelTankCapacity = routerProfile != null
 				&& routerProfile != GeneralRouterProfile.PEDESTRIAN
 				&& routerProfile != GeneralRouterProfile.BICYCLE
@@ -106,6 +120,40 @@ public class VehicleParametersFragment extends BaseSettingsFragment {
 		setupRoutingParameterPref(motorTypeParameter);
 		if (showFuelTankCapacity) {
 			setupFuelTankCapacityPref();
+		}
+	}
+
+	private void showBikesCategory() {
+		addDividerPref();
+		setupCategoryPref(R.string.bikes);
+
+		Preference bikesPref = new Preference(requireContext());
+		bikesPref.setKey(BIKES_PREF_ID);
+		bikesPref.setTitle(R.string.bikes);
+		bikesPref.setIcon(getPersistentPrefIcon(getSelectedAppMode().getIconRes()));
+		bikesPref.setLayoutResource(R.layout.preference_with_descr);
+		getPreferenceScreen().addPreference(bikesPref);
+		updateBikesSummary();
+	}
+
+	private void updateBikesSummary() {
+		Preference bikesPref = findPreference(BIKES_PREF_ID);
+		if (bikesPref != null) {
+			BikeGarage garage = new BikeHelper(app).getGarage();
+			List<String> names = new ArrayList<>();
+			for (Bike bike : garage.bikesOfProfile(getSelectedAppMode().getStringKey())) {
+				names.add(bike.getName());
+			}
+			bikesPref.setSummary(names.isEmpty()
+					? getString(R.string.bike_profile_none, getSelectedAppMode().toHumanString())
+					: TextUtils.join(", ", names));
+		}
+	}
+
+	private void onBikesChanged() {
+		updateBikesSummary();
+		if (getActivity() instanceof MapActivity) {
+			((MapActivity) getActivity()).getMapRouteInfoMenu().updateMenu();
 		}
 	}
 
@@ -247,6 +295,12 @@ public class VehicleParametersFragment extends BaseSettingsFragment {
 				ApplicationMode mode = getSelectedAppMode();
 				VehicleSpeedHelper speedHelper = new VehicleSpeedHelper(app, mode);
 				speedHelper.showSeekbarSettingsDialog(activity);
+			}
+			return true;
+		} else if (BIKES_PREF_ID.equals(key)) {
+			FragmentActivity activity = getActivity();
+			if (activity != null) {
+				BikeDialogs.showGarage(activity, isNightMode(), this::onBikesChanged);
 			}
 			return true;
 		} else if (settings.FUEL_TANK_CAPACITY.getId().equals(key)) {

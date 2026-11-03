@@ -24,7 +24,10 @@ import net.osmand.data.LatLon;
 import net.osmand.data.PointDescription;
 import net.osmand.plus.OsmAndLocationProvider;
 import net.osmand.plus.OsmandApplication;
+import net.osmand.plus.BuildConfig;
 import net.osmand.plus.R;
+import net.osmand.plus.bikes.BikeDialogs;
+import net.osmand.plus.bikes.BikeHelper;
 import net.osmand.plus.Version;
 import net.osmand.plus.backup.ui.BackupAuthorizationFragment;
 import net.osmand.plus.backup.ui.BackupCloudFragment;
@@ -101,6 +104,7 @@ public class MapActivityActions extends MapActions {
 	public static final int MEASURE_DISTANCE_ITEM_ORDER = 13000;
 	public static final int AVOID_ROAD_ITEM_ORDER = 14000;
 
+	private static final String DRAWER_BIKES_ID = DRAWER_ITEM_ID_SCHEME + "bikes";
 	private static final int DRAWER_MODE_NORMAL = 0;
 	private static final int DRAWER_MODE_SWITCH_PROFILE = 1;
 
@@ -412,6 +416,19 @@ public class MapActivityActions extends MapActions {
 			@NonNull ContextMenuAdapter adapter, boolean nightMode) {
 		createProfilesController(activity, adapter, nightMode, false);
 		addSaleToDrawer(activity, adapter, nightMode);
+
+		if (BuildConfig.RIDING_QUESTIONS) {
+			// cycling editions: the rider's bikes, right at the top (also the bike button on the map)
+			BikeHelper bikeHelper = new BikeHelper(app);
+			adapter.addItem(new ContextMenuItem(DRAWER_BIKES_ID)
+					.setTitleId(R.string.bikes, activity)
+					.setIcon(bikeHelper.getIconRes(bikeHelper.getCurrentBike(settings.getApplicationMode())))
+					.setListener((uiAdapter, view, item, isChecked) -> {
+						activity.closeDrawer();
+						BikeDialogs.showGarage(activity, nightMode, activity::refreshMap);
+						return true;
+					}));
+		}
 
 		adapter.addItem(new ContextMenuItem(DRAWER_DASHBOARD_ID)
 				.setTitleId(R.string.home, activity)

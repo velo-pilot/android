@@ -118,6 +118,7 @@ public class MapButtonsHelper {
 	private ZoomInButtonState zoomInButtonState;
 	private ZoomOutButtonState zoomOutButtonState;
 	private ConfigureMapButtonState configureMapButtonState;
+	private BikeButtonState bikeButtonState;
 	private DrawerMenuButtonState drawerMenuButtonState;
 	private CompassButtonState compassButtonState;
 	private List<QuickActionButtonState> quickActionStates = new ArrayList<>();
@@ -142,6 +143,7 @@ public class MapButtonsHelper {
 	private void initDefaultButtons() {
 		compassButtonState = new CompassButtonState(app);
 		configureMapButtonState = new ConfigureMapButtonState(app);
+		bikeButtonState = new BikeButtonState(app);
 		drawerMenuButtonState = new DrawerMenuButtonState(app);
 		map3DButtonState = new Map3DButtonState(app);
 		myLocationButtonState = new MyLocationButtonState(app);
@@ -210,6 +212,11 @@ public class MapButtonsHelper {
 	}
 
 	@NonNull
+	public BikeButtonState getBikeButtonState() {
+		return bikeButtonState;
+	}
+
+	@NonNull
 	public DrawerMenuButtonState getDrawerMenuButtonState() {
 		return drawerMenuButtonState;
 	}
@@ -221,7 +228,7 @@ public class MapButtonsHelper {
 
 	@NonNull
 	public List<MapButtonState> getDefaultButtonsStates() {
-		return Arrays.asList(configureMapButtonState, quickSearchButtonState,
+		return Arrays.asList(configureMapButtonState, bikeButtonState, quickSearchButtonState,
 				compassButtonState, drawerMenuButtonState, navigationMenuButtonState,
 				map3DButtonState, myLocationButtonState, zoomInButtonState, zoomOutButtonState
 		);
