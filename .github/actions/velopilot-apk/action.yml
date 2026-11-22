@@ -21,7 +21,7 @@ runs:
         java-version: 17
 
     # v5, not v6: from v6 on the caching is a closed-source component under Gradle's Terms of Use
-    - uses: gradle/actions/setup-gradle@v5
+    - uses: gradle/actions/setup-gradle@v6
 
     # Kotlin/Native toolchain of the multiplatform OsmAnd-shared module
     - uses: actions/cache@v6
