@@ -36,10 +36,13 @@
 		<attribute name="penaltyForReverseDirection" value="60"/>
 		<attribute name="shortWaySharpTurn" value="0"/>
 		<attribute name="shortWaySlightTurn" value="0"/>
+		<!-- Ways where the rider walks beside the bike get exactly this speed (km/h); the app reads it to
+		     announce "step off and walk" (RouteResultPreparation.markWalkingWithBike) -->
+		<attribute name="walkingSpeed" value="5"/>
 
 		<!-- Boolean routing preferences are shared by id between profiles and keep the default of the
 		     profile that registers them first, so every parameter here defaults to false except the
-		     driving style, which uses the same default as the bicycle profile. -->
+		     driving style and walking with the bike, which use the same default as the bicycle profile. -->
 		<parameter id="short_way" name="Short way" description="Shortest instead of fastest route" type="boolean"/>
 
 		<parameter id="driving_style_safety" group="driving_style" name="Safety" description="Prefer cycle paths and quiet streets, avoid main roads" type="boolean"/>
@@ -57,6 +60,8 @@
 		<parameter id="avoid_moped_no_cycleways" name="No cycle paths closed to mopeds" description="Avoids cycle paths closed to mopeds. In Belgium these can be open (D7 + M7) or closed (D7 + M16) to speed pedelecs" type="boolean"/>
 		<parameter id="allow_bicycle_contraflow" name="Use cycle contraflow" description="Ride against one-way traffic where cyclists may. Legal only where the sub-sign shows the speed pedelec symbol" type="boolean"/>
 		<parameter id="allow_pedestrian_zones" name="Use pedestrian zones" description="Ride through pedestrian zones at walking pace. Legal only where the sign allows speed pedelecs" type="boolean"/>
+		<!-- On by default (the app passes it unless the rider switches it off); same id as in bicycle.xml -->
+		<parameter id="allow_walking_with_bike" name="Allow walking with the bike" description="Where you may not ride (pedestrian zones, footways, dismount signs), the route can have you walk beside the bike, and tells you when to step off and get back on" type="boolean" default="true"/>
 
 		<parameter id="avoid_unpaved" name="Avoid unpaved roads" description="Avoid unpaved roads" type="boolean"/>
 		<parameter id="avoid_sett" name="Avoid sett" description="Avoid streets paved with sett" type="boolean"/>
@@ -111,6 +116,58 @@
 			<select value="-1" t="access" v="private"/>
 			<select value="-1" t="vehicle" v="private"/>
 			<select value="-1" t="motor_vehicle" v="private"/>
+
+			<!-- Walking with the bike (same rule set in access, oneway, speed, priority and
+			     penalty_transition; WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="moped" v="yes"><ifnot t="moped" v="designated"><ifnot t="moped" v="permissive"><ifnot t="moped" v="destination"><ifnot t="moped" v="dismount">
+				<ifnot param="allow_pedestrian_zones">
+					<!-- moped=no with bicycle=designated is read as a cycle path open to class P -->
+					<select value="1" t="highway" v="pedestrian"><ifnot t="moped" v="no"/></select>
+					<select value="1" t="highway" v="pedestrian"><ifnot t="bicycle" v="designated"/></select>
+				</ifnot>
+				<ifnot param="moped_rules">
+					<select value="1" t="segregated" v="no"/>
+					<select value="1" t="highway" v="footway"><ifnot t="bicycle" v="designated"/></select>
+					<select value="1" t="bicycle" v="no"><ifnot t="moped" v="no"/></select>
+				</ifnot>
+				<if param="moped_rules">
+					<select value="1" t="highway" v="footway"/>
+					<select value="1" t="highway" v="path"/>
+				</if>
+				<!-- Roads closed to vehicles where a speed pedelec may not ride: walk on the sidewalk -->
+				<ifnot t="highway" v="cycleway"><ifnot t="highway" v="footway"><ifnot t="highway" v="pedestrian">
+				<ifnot t="moped" v="no"><ifnot t="access" v="no"><ifnot t="access" v="agricultural"><ifnot t="access" v="forestry">
+					<if param="moped_rules">
+						<select value="1" t="vehicle" v="no"/>
+						<select value="1" t="vehicle" v="agricultural"/>
+						<select value="1" t="vehicle" v="forestry"/>
+						<select value="1" t="motor_vehicle" v="no"/>
+						<select value="1" t="motor_vehicle" v="agricultural"/>
+						<select value="1" t="motor_vehicle" v="forestry"/>
+					</if>
+					<ifnot param="moped_rules">
+						<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive">
+							<select value="1" t="vehicle" v="no"/>
+							<select value="1" t="vehicle" v="agricultural"/>
+							<select value="1" t="vehicle" v="forestry"/>
+							<select value="1" t="motor_vehicle" v="no"/>
+							<select value="1" t="motor_vehicle" v="agricultural"/>
+							<select value="1" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot></ifnot>
+						<ifnot param="allow_closed_to_vehicles"><ifnot t="route_bicycle">
+							<select value="1" t="vehicle" v="no"/>
+							<select value="1" t="vehicle" v="agricultural"/>
+							<select value="1" t="vehicle" v="forestry"/>
+							<select value="1" t="motor_vehicle" v="no"/>
+							<select value="1" t="motor_vehicle" v="agricultural"/>
+							<select value="1" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot>
+					</ifnot>
+				</ifnot></ifnot></ifnot></ifnot>
+				</ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
 
 			<!-- Moped rules: nothing reserved for cyclists, nothing closed to motor vehicles -->
 			<if param="moped_rules">
@@ -256,6 +313,58 @@
 
 		<!-- ============================ Oneway ============================ -->
 		<way attribute="oneway">
+			<!-- Walking with the bike (same rule set in access, oneway, speed, priority and
+			     penalty_transition; WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="moped" v="yes"><ifnot t="moped" v="designated"><ifnot t="moped" v="permissive"><ifnot t="moped" v="destination"><ifnot t="moped" v="dismount">
+				<ifnot param="allow_pedestrian_zones">
+					<!-- moped=no with bicycle=designated is read as a cycle path open to class P -->
+					<select value="0" t="highway" v="pedestrian"><ifnot t="moped" v="no"/></select>
+					<select value="0" t="highway" v="pedestrian"><ifnot t="bicycle" v="designated"/></select>
+				</ifnot>
+				<ifnot param="moped_rules">
+					<select value="0" t="segregated" v="no"/>
+					<select value="0" t="highway" v="footway"><ifnot t="bicycle" v="designated"/></select>
+					<select value="0" t="bicycle" v="no"><ifnot t="moped" v="no"/></select>
+				</ifnot>
+				<if param="moped_rules">
+					<select value="0" t="highway" v="footway"/>
+					<select value="0" t="highway" v="path"/>
+				</if>
+				<!-- Roads closed to vehicles where a speed pedelec may not ride: walk on the sidewalk -->
+				<ifnot t="highway" v="cycleway"><ifnot t="highway" v="footway"><ifnot t="highway" v="pedestrian">
+				<ifnot t="moped" v="no"><ifnot t="access" v="no"><ifnot t="access" v="agricultural"><ifnot t="access" v="forestry">
+					<if param="moped_rules">
+						<select value="0" t="vehicle" v="no"/>
+						<select value="0" t="vehicle" v="agricultural"/>
+						<select value="0" t="vehicle" v="forestry"/>
+						<select value="0" t="motor_vehicle" v="no"/>
+						<select value="0" t="motor_vehicle" v="agricultural"/>
+						<select value="0" t="motor_vehicle" v="forestry"/>
+					</if>
+					<ifnot param="moped_rules">
+						<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive">
+							<select value="0" t="vehicle" v="no"/>
+							<select value="0" t="vehicle" v="agricultural"/>
+							<select value="0" t="vehicle" v="forestry"/>
+							<select value="0" t="motor_vehicle" v="no"/>
+							<select value="0" t="motor_vehicle" v="agricultural"/>
+							<select value="0" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot></ifnot>
+						<ifnot param="allow_closed_to_vehicles"><ifnot t="route_bicycle">
+							<select value="0" t="vehicle" v="no"/>
+							<select value="0" t="vehicle" v="agricultural"/>
+							<select value="0" t="vehicle" v="forestry"/>
+							<select value="0" t="motor_vehicle" v="no"/>
+							<select value="0" t="motor_vehicle" v="agricultural"/>
+							<select value="0" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot>
+					</ifnot>
+				</ifnot></ifnot></ifnot></ifnot>
+				</ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
+
 			<!-- Contraflow for cyclists (M2/M4) does not include speed pedelecs unless the sub-sign shows
 			     the speed pedelec symbol; OsmAnd maps do not store oneway:moped. -->
 			<if param="allow_bicycle_contraflow">
@@ -285,9 +394,65 @@
 		<!-- Cruising speeds in km/h for the time estimate, capped at maxSpeed (45). Road types without a rule
 		     use the profile's default speed (35, Vehicle parameters > Default speed). -->
 		<way attribute="speed" type="speed">
-			<select value="$maxspeed:moped" t="maxspeed:moped"/>
-			<select value="6" t="moped" v="dismount"/>
-			<select value="6" t="bicycle" v="dismount"/>
+			<!-- Walking with the bike (same rule set in access, oneway, speed, priority and
+			     penalty_transition; WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="moped" v="yes"><ifnot t="moped" v="designated"><ifnot t="moped" v="permissive"><ifnot t="moped" v="destination"><ifnot t="moped" v="dismount">
+				<ifnot param="allow_pedestrian_zones">
+					<!-- moped=no with bicycle=designated is read as a cycle path open to class P -->
+					<select value="5" t="highway" v="pedestrian"><ifnot t="moped" v="no"/></select>
+					<select value="5" t="highway" v="pedestrian"><ifnot t="bicycle" v="designated"/></select>
+				</ifnot>
+				<ifnot param="moped_rules">
+					<select value="5" t="segregated" v="no"/>
+					<select value="5" t="highway" v="footway"><ifnot t="bicycle" v="designated"/></select>
+					<select value="5" t="bicycle" v="no"><ifnot t="moped" v="no"/></select>
+				</ifnot>
+				<if param="moped_rules">
+					<select value="5" t="highway" v="footway"/>
+					<select value="5" t="highway" v="path"/>
+				</if>
+				<!-- Roads closed to vehicles where a speed pedelec may not ride: walk on the sidewalk -->
+				<ifnot t="highway" v="cycleway"><ifnot t="highway" v="footway"><ifnot t="highway" v="pedestrian">
+				<ifnot t="moped" v="no"><ifnot t="access" v="no"><ifnot t="access" v="agricultural"><ifnot t="access" v="forestry">
+					<if param="moped_rules">
+						<select value="5" t="vehicle" v="no"/>
+						<select value="5" t="vehicle" v="agricultural"/>
+						<select value="5" t="vehicle" v="forestry"/>
+						<select value="5" t="motor_vehicle" v="no"/>
+						<select value="5" t="motor_vehicle" v="agricultural"/>
+						<select value="5" t="motor_vehicle" v="forestry"/>
+					</if>
+					<ifnot param="moped_rules">
+						<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive">
+							<select value="5" t="vehicle" v="no"/>
+							<select value="5" t="vehicle" v="agricultural"/>
+							<select value="5" t="vehicle" v="forestry"/>
+							<select value="5" t="motor_vehicle" v="no"/>
+							<select value="5" t="motor_vehicle" v="agricultural"/>
+							<select value="5" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot></ifnot>
+						<ifnot param="allow_closed_to_vehicles"><ifnot t="route_bicycle">
+							<select value="5" t="vehicle" v="no"/>
+							<select value="5" t="vehicle" v="agricultural"/>
+							<select value="5" t="vehicle" v="forestry"/>
+							<select value="5" t="motor_vehicle" v="no"/>
+							<select value="5" t="motor_vehicle" v="agricultural"/>
+							<select value="5" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot>
+					</ifnot>
+				</ifnot></ifnot></ifnot></ifnot>
+				</ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
+
+			<!-- Never as low as walkingSpeed, which marks walking -->
+			<select value="$maxspeed:moped" t="maxspeed:moped">
+				<gt value1="$maxspeed:moped" value2="5" type="speed"/>
+			</select>
+			<!-- Walking pace: dismount signs; must equal walkingSpeed -->
+			<select value="5" t="moped" v="dismount"/>
+			<select value="5" t="bicycle" v="dismount"/>
 			<select value="10" t="route" v="ferry"/>
 			<select value="10" t="route" v="boat"/>
 			<select value="6" t="highway" v="pedestrian"/>
@@ -303,6 +468,7 @@
 			<!-- Posted limit when it is below the cruising speed (zone 30, cycle street, woonerf, ...) -->
 			<select value="$maxspeed" t="maxspeed">
 				<ge value1="38" value2="$maxspeed" type="speed"/>
+				<gt value1="$maxspeed" value2="5" type="speed"/>
 			</select>
 
 			<select value="38" t="highway" v="cycleway"/>
@@ -330,6 +496,58 @@
 		<!-- ============================ Priority ============================ -->
 		<!-- First match wins: surface penalties come before the driving style. -->
 		<way attribute="priority">
+			<!-- Walking with the bike (same rule set in access, oneway, speed, priority and
+			     penalty_transition; WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="moped" v="yes"><ifnot t="moped" v="designated"><ifnot t="moped" v="permissive"><ifnot t="moped" v="destination"><ifnot t="moped" v="dismount">
+				<ifnot param="allow_pedestrian_zones">
+					<!-- moped=no with bicycle=designated is read as a cycle path open to class P -->
+					<select value="0.8" t="highway" v="pedestrian"><ifnot t="moped" v="no"/></select>
+					<select value="0.8" t="highway" v="pedestrian"><ifnot t="bicycle" v="designated"/></select>
+				</ifnot>
+				<ifnot param="moped_rules">
+					<select value="0.8" t="segregated" v="no"/>
+					<select value="0.8" t="highway" v="footway"><ifnot t="bicycle" v="designated"/></select>
+					<select value="0.8" t="bicycle" v="no"><ifnot t="moped" v="no"/></select>
+				</ifnot>
+				<if param="moped_rules">
+					<select value="0.8" t="highway" v="footway"/>
+					<select value="0.8" t="highway" v="path"/>
+				</if>
+				<!-- Roads closed to vehicles where a speed pedelec may not ride: walk on the sidewalk -->
+				<ifnot t="highway" v="cycleway"><ifnot t="highway" v="footway"><ifnot t="highway" v="pedestrian">
+				<ifnot t="moped" v="no"><ifnot t="access" v="no"><ifnot t="access" v="agricultural"><ifnot t="access" v="forestry">
+					<if param="moped_rules">
+						<select value="0.8" t="vehicle" v="no"/>
+						<select value="0.8" t="vehicle" v="agricultural"/>
+						<select value="0.8" t="vehicle" v="forestry"/>
+						<select value="0.8" t="motor_vehicle" v="no"/>
+						<select value="0.8" t="motor_vehicle" v="agricultural"/>
+						<select value="0.8" t="motor_vehicle" v="forestry"/>
+					</if>
+					<ifnot param="moped_rules">
+						<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive">
+							<select value="0.8" t="vehicle" v="no"/>
+							<select value="0.8" t="vehicle" v="agricultural"/>
+							<select value="0.8" t="vehicle" v="forestry"/>
+							<select value="0.8" t="motor_vehicle" v="no"/>
+							<select value="0.8" t="motor_vehicle" v="agricultural"/>
+							<select value="0.8" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot></ifnot>
+						<ifnot param="allow_closed_to_vehicles"><ifnot t="route_bicycle">
+							<select value="0.8" t="vehicle" v="no"/>
+							<select value="0.8" t="vehicle" v="agricultural"/>
+							<select value="0.8" t="vehicle" v="forestry"/>
+							<select value="0.8" t="motor_vehicle" v="no"/>
+							<select value="0.8" t="motor_vehicle" v="agricultural"/>
+							<select value="0.8" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot>
+					</ifnot>
+				</ifnot></ifnot></ifnot></ifnot>
+				</ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
+
 			<!-- Cycle node network: ways off the network, in the order of the table below -->
 			<if param="node_network_prefer">
 				<ifnot t="route_bicycle">
@@ -629,6 +847,63 @@
 			<select value="0.8" t="highway" v="service"/>
 			<select value="0.8" t="highway" v="living_street"/>
 			<select value="0.6" t="highway" v="track"/>
+		</way>
+
+		<!-- ============================ Transitions ============================ -->
+		<!-- Routing cost of |a - b| / 2 seconds between ways with different values: stepping off or back
+		     on the bike costs 10 s each -->
+		<way attribute="penalty_transition">
+			<!-- Walking with the bike (same rule set in access, oneway, speed, priority and
+			     penalty_transition; WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="moped" v="yes"><ifnot t="moped" v="designated"><ifnot t="moped" v="permissive"><ifnot t="moped" v="destination"><ifnot t="moped" v="dismount">
+				<ifnot param="allow_pedestrian_zones">
+					<!-- moped=no with bicycle=designated is read as a cycle path open to class P -->
+					<select value="20" t="highway" v="pedestrian"><ifnot t="moped" v="no"/></select>
+					<select value="20" t="highway" v="pedestrian"><ifnot t="bicycle" v="designated"/></select>
+				</ifnot>
+				<ifnot param="moped_rules">
+					<select value="20" t="segregated" v="no"/>
+					<select value="20" t="highway" v="footway"><ifnot t="bicycle" v="designated"/></select>
+					<select value="20" t="bicycle" v="no"><ifnot t="moped" v="no"/></select>
+				</ifnot>
+				<if param="moped_rules">
+					<select value="20" t="highway" v="footway"/>
+					<select value="20" t="highway" v="path"/>
+				</if>
+				<!-- Roads closed to vehicles where a speed pedelec may not ride: walk on the sidewalk -->
+				<ifnot t="highway" v="cycleway"><ifnot t="highway" v="footway"><ifnot t="highway" v="pedestrian">
+				<ifnot t="moped" v="no"><ifnot t="access" v="no"><ifnot t="access" v="agricultural"><ifnot t="access" v="forestry">
+					<if param="moped_rules">
+						<select value="20" t="vehicle" v="no"/>
+						<select value="20" t="vehicle" v="agricultural"/>
+						<select value="20" t="vehicle" v="forestry"/>
+						<select value="20" t="motor_vehicle" v="no"/>
+						<select value="20" t="motor_vehicle" v="agricultural"/>
+						<select value="20" t="motor_vehicle" v="forestry"/>
+					</if>
+					<ifnot param="moped_rules">
+						<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive">
+							<select value="20" t="vehicle" v="no"/>
+							<select value="20" t="vehicle" v="agricultural"/>
+							<select value="20" t="vehicle" v="forestry"/>
+							<select value="20" t="motor_vehicle" v="no"/>
+							<select value="20" t="motor_vehicle" v="agricultural"/>
+							<select value="20" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot></ifnot>
+						<ifnot param="allow_closed_to_vehicles"><ifnot t="route_bicycle">
+							<select value="20" t="vehicle" v="no"/>
+							<select value="20" t="vehicle" v="agricultural"/>
+							<select value="20" t="vehicle" v="forestry"/>
+							<select value="20" t="motor_vehicle" v="no"/>
+							<select value="20" t="motor_vehicle" v="agricultural"/>
+							<select value="20" t="motor_vehicle" v="forestry"/>
+						</ifnot></ifnot>
+					</ifnot>
+				</ifnot></ifnot></ifnot></ifnot>
+				</ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
 		</way>
 
 		<!-- ============================ Elevation (optional) ============================ -->

@@ -497,9 +497,14 @@ public class RouteCalculationResult {
 						}
 					}
 				}
+				if (turn.isWalkStart()) {
+					String lang = ctx.getSettings().MAP_PREFERRED_LOCALE.get().toLowerCase();
+					boolean transliterate = ctx.getSettings().MAP_TRANSLITERATE_NAMES.get();
+					info.setWalkToName(WalkWithBikeInstructions.findWalkToName(list, routeInd, lang, transliterate));
+				}
 				String description = toString(turn, ctx, true) + " " + RoutingHelperUtils.formatStreetName(info.getStreetName(),
 						info.getRef(), info.getDestinationRefAndName(), ctx.getString(R.string.towards));
-				description = description.trim();
+				description = WalkWithBikeInstructions.describe(ctx, info, description.trim());
 				String[] pointNames = s.getObject().getPointNames(s.getStartPointIndex());
 				if (pointNames != null) {
 					for (int t = 0; t < pointNames.length; t++) {

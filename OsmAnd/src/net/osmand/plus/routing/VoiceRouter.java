@@ -13,6 +13,7 @@ import android.media.AudioAttributes;
 import android.media.SoundPool;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import net.osmand.Location;
 import net.osmand.StateChangedListener;
@@ -751,6 +752,14 @@ public class VoiceRouter {
 			} else {
 				isPlay = false;
 			}
+			String walk = getWalkWithBikePhrase(p, next);
+			if (walk != null) {
+				if (!isPlay) {
+					p.goAhead(dist, new StreetName());
+				}
+				p.then().speak(walk);
+				isPlay = true;
+			}
 			// 'then keep' preparation for next after next. (Also announces an interim straight segment, which is not pronounced above.)
 			if (pronounceNextNext != null) {
 				TurnType t = pronounceNextNext.getTurnType();
@@ -825,6 +834,14 @@ public class VoiceRouter {
 			} else {
 				isplay = false;
 			}
+			String walk = getWalkWithBikePhrase(p, next);
+			if (walk != null) {
+				if (isplay) {
+					p.then();
+				}
+				p.speak(walk);
+				isplay = true;
+			}
 			// Add turn after next
 			if ((nextNextInfo != null) && (nextNextInfo.directionInfo != null)) {
 
@@ -858,6 +875,11 @@ public class VoiceRouter {
 		}
 	}
 	
+	@Nullable
+	private String getWalkWithBikePhrase(@NonNull CommandBuilder p, @NonNull RouteDirectionInfo next) {
+		return p.canSpeakText() ? WalkWithBikeInstructions.getPhrase(app, next) : null;
+	}
+
 	private String getTurnType(@NonNull TurnType t) {
 		if (TurnType.TL == t.getValue()) {
 			return CommandPlayer.A_LEFT;

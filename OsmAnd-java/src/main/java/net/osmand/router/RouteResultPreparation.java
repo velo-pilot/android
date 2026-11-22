@@ -271,7 +271,69 @@ public class RouteResultPreparation {
 		justifyUTurns(ctx.leftSideNavigation, result);
 		avoidKeepForThroughMoving(result);
 		muteAndRemoveTurns(result, ctx);
+		markWalkingWithBike(ctx, result);
 		addTurnInfoDescriptions(result);
+	}
+
+	// Shorter walks (a footway link at a crossing, the drive to the front door) are not announced
+	static final double MIN_ANNOUNCED_WALK = 20;
+
+	/**
+	 * Profiles with a "walkingSpeed" attribute (speed pedelec, bicycle and the profiles that extend it) give
+	 * ways where the rider walks beside the bike that speed or less (steps, platforms). With the parameter
+	 * allow_walking_with_bike on, marks the turn where each walk starts and ends so the app can say "step off
+	 * and walk" and "get back on your bike".
+	 */
+	public static void markWalkingWithBike(RoutingContext ctx, List<RouteSegmentResult> result) {
+		if (!(ctx.getRouter() instanceof GeneralRouter)) {
+			return;
+		}
+		GeneralRouter router = (GeneralRouter) ctx.getRouter();
+		float walkingSpeed = router.getFloatAttribute(WALKING_SPEED, -1);
+		// Boolean parameters are passed only when on
+		if (walkingSpeed <= 0 || !router.getParameterValues().containsKey(ALLOW_WALKING_WITH_BIKE)) {
+			return;
+		}
+		int start = -1;
+		for (int i = 0; i <= result.size(); i++) {
+			boolean walking = i < result.size() && isWalkingWithBike(router, walkingSpeed, result.get(i));
+			if (walking && start == -1) {
+				start = i;
+			} else if (!walking && start != -1) {
+				double distance = 0;
+				for (int j = start; j < i; j++) {
+					distance += result.get(j).getDistance();
+				}
+				if (distance >= MIN_ANNOUNCED_WALK) {
+					markWalkTurn(ctx, result.get(start), TurnType.WALK_START);
+					if (i < result.size()) {
+						markWalkTurn(ctx, result.get(i), TurnType.WALK_END);
+					}
+				}
+				start = -1;
+			}
+		}
+	}
+
+	public static final String WALKING_SPEED = "walkingSpeed";
+	public static final String ALLOW_WALKING_WITH_BIKE = "allow_walking_with_bike";
+
+	// The speed the rules give, before defineRoutingSpeed raises it to minSpeed (5 km/h for bicycles), which
+	// would make slow riding (sidewalks in some driving styles) look like walking
+	public static boolean isWalkingWithBike(GeneralRouter router, float walkingSpeedKmh, RouteSegmentResult segment) {
+		float speed = router.getObjContext(GeneralRouter.RouteDataObjectAttribute.ROAD_SPEED)
+				.evaluateFloat(segment.getObject(), Float.MAX_VALUE);
+		return speed * 3.6f <= walkingSpeedKmh + 0.01f;
+	}
+
+	private static void markWalkTurn(RoutingContext ctx, RouteSegmentResult segment, int walk) {
+		TurnType turn = segment.getTurnType();
+		if (turn == null) {
+			turn = TurnType.valueOf(TurnType.C, ctx.leftSideNavigation);
+			segment.setTurnType(turn);
+		}
+		turn.setSkipToSpeak(false);
+		turn.setWalkWithBike(walk);
 	}
 
 	protected void ignorePrecedingStraightsOnSameIntersection(boolean leftside, List<RouteSegmentResult> result) {

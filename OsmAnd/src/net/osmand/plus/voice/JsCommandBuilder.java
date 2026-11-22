@@ -20,6 +20,7 @@ public class JsCommandBuilder extends CommandBuilder{
 
 	private Context jsContext;
 	private ScriptableObject jsScope;
+	private boolean tts;
 
 	public JsCommandBuilder(CommandPlayer commandPlayer) {
 		super(commandPlayer);
@@ -31,6 +32,7 @@ public class JsCommandBuilder extends CommandBuilder{
 	}
 
 	public void setParameters(String metricCons, boolean tts) {
+		this.tts = tts;
 		Object mode = jsScope.get(SET_MODE, jsScope);
 		Object metrics = jsScope.get(SET_METRIC_CONST, jsScope);
 		callVoidJsFunction(mode, new Object[]{tts});
@@ -42,6 +44,20 @@ public class JsCommandBuilder extends CommandBuilder{
 			Function jsFunction = (Function) function;
 			jsFunction.call(jsContext, jsScope, jsScope, params);
 		}
+	}
+
+	@Override
+	public boolean canSpeakText() {
+		return tts;
+	}
+
+	@Override
+	public CommandBuilder speak(String text) {
+		if (tts && text != null && !text.isEmpty()) {
+			addToCommandList("speak", text);
+			listStruct.add(text);
+		}
+		return this;
 	}
 
 	@Override

@@ -36,6 +36,107 @@
 		<parameter id="node_network_strict" group="node_network" name="Stay on the network" description="Leave the cycle node network only to reach the start or destination, or where it has a gap" type="boolean" hhRouting="false"/>
 		<parameter id="driving_style_leisure" group="driving_style" name="Leisure" description="Slower but nicer: cycle routes, cycle paths and quiet roads, away from main roads" type="boolean" hhRouting="false"/>
 
+		<!-- Walking with the bike, on by default (the app passes it unless the rider switches it off; same id
+		     as in speed_pedelec.xml). Where a bicycle may not be ridden (pedestrian zones, footways and sidewalks,
+		     dismount signs, bicycle=no, roads closed to vehicles) the rider pushes the bike at walkingSpeed.
+		     Routing raises that to the profile's minSpeed (5 km/h); RouteResultPreparation.markWalkingWithBike
+		     compares the speed of the rules, so the rules' own slow ways count as walking too (steps,
+		     platforms: below 4 km/h) but slow riding does not (sidewalks with bicycle=yes: 5 km/h in some
+		     driving styles). Off: the rules of routing.xml, without walking instructions. The precalculated (HH)
+		     routes don't know these ways, so it uses standard routing. -->
+		<attribute name="walkingSpeed" value="4"/>
+		<parameter id="allow_walking_with_bike" name="Allow walking with the bike" description="Where you may not ride (pedestrian zones, footways, dismount signs), the route can have you walk beside the bike, and tells you when to step off and get back on" type="boolean" default="true" hhRouting="false"/>
+
+		<way attribute="access">
+			<!-- Walking with the bike (same rule set in access, oneway, speed and penalty_transition;
+			     WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive"><ifnot t="bicycle" v="destination"><ifnot t="cycleway:bicycle" v="designated">
+			<ifnot t="access" v="no"><ifnot t="access" v="private"><ifnot t="vehicle" v="private"><ifnot t="osmand_change" v="delete">
+			<ifnot t="highway" v="motorway"><ifnot t="highway" v="motorway_link"><ifnot t="motorroad" v="yes"><ifnot t="highway" v="construction"><ifnot t="highway" v="proposed">
+			<!-- Zebra crossings: too short to announce, and walking them would push routes away from them -->
+			<ifnot t="footway" v="crossing">
+				<select value="1" t="bicycle" v="no"/>
+				<select value="1" t="bicycle" v="dismount"/>
+				<select value="1" t="highway" v="pedestrian"/>
+				<select value="1" t="highway" v="footway"/>
+				<!-- Roads closed to all vehicles (C3) -->
+				<select value="1" t="vehicle" v="no"/>
+			</ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
+		</way>
+
+		<way attribute="oneway">
+			<!-- Walking with the bike (same rule set in access, oneway, speed and penalty_transition;
+			     WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive"><ifnot t="bicycle" v="destination"><ifnot t="cycleway:bicycle" v="designated">
+			<ifnot t="access" v="no"><ifnot t="access" v="private"><ifnot t="vehicle" v="private"><ifnot t="osmand_change" v="delete">
+			<ifnot t="highway" v="motorway"><ifnot t="highway" v="motorway_link"><ifnot t="motorroad" v="yes"><ifnot t="highway" v="construction"><ifnot t="highway" v="proposed">
+			<!-- Zebra crossings: too short to announce, and walking them would push routes away from them -->
+			<ifnot t="footway" v="crossing">
+				<select value="0" t="bicycle" v="no"/>
+				<select value="0" t="bicycle" v="dismount"/>
+				<select value="0" t="highway" v="pedestrian"/>
+				<select value="0" t="highway" v="footway"/>
+				<!-- Roads closed to all vehicles (C3) -->
+				<select value="0" t="vehicle" v="no"/>
+			</ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
+		</way>
+
+		<way attribute="speed" type="speed">
+			<!-- Walking with the bike (same rule set in access, oneway, speed and penalty_transition;
+			     WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive"><ifnot t="bicycle" v="destination"><ifnot t="cycleway:bicycle" v="designated">
+			<ifnot t="access" v="no"><ifnot t="access" v="private"><ifnot t="vehicle" v="private"><ifnot t="osmand_change" v="delete">
+			<ifnot t="highway" v="motorway"><ifnot t="highway" v="motorway_link"><ifnot t="motorroad" v="yes"><ifnot t="highway" v="construction"><ifnot t="highway" v="proposed">
+			<!-- Zebra crossings: too short to announce, and walking them would push routes away from them -->
+			<ifnot t="footway" v="crossing">
+				<select value="4" t="bicycle" v="no"/>
+				<select value="4" t="bicycle" v="dismount"/>
+				<select value="4" t="highway" v="pedestrian"/>
+				<select value="4" t="highway" v="footway"/>
+				<!-- Roads closed to all vehicles (C3) -->
+				<select value="4" t="vehicle" v="no"/>
+			</ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
+		</way>
+
+		<!-- Routing cost of |a - b| / 2 seconds between ways with different values: stepping off or back on
+		     the bike costs about 10 s each -->
+		<way attribute="penalty_transition">
+			<!-- Walking with the bike (same rule set in access, oneway, speed and penalty_transition;
+			     WalkingWithBikeTest keeps the copies in sync) -->
+			<if param="allow_walking_with_bike"><ifnot t="foot" v="no"><ifnot t="foot" v="use_sidepath">
+			<ifnot t="bicycle" v="yes"><ifnot t="bicycle" v="designated"><ifnot t="bicycle" v="permissive"><ifnot t="bicycle" v="destination"><ifnot t="cycleway:bicycle" v="designated">
+			<ifnot t="access" v="no"><ifnot t="access" v="private"><ifnot t="vehicle" v="private"><ifnot t="osmand_change" v="delete">
+			<ifnot t="highway" v="motorway"><ifnot t="highway" v="motorway_link"><ifnot t="motorroad" v="yes"><ifnot t="highway" v="construction"><ifnot t="highway" v="proposed">
+			<!-- Zebra crossings: too short to announce, and walking them would push routes away from them -->
+			<ifnot t="footway" v="crossing">
+				<select value="20" t="bicycle" v="no"/>
+				<select value="20" t="bicycle" v="dismount"/>
+				<select value="20" t="highway" v="pedestrian"/>
+				<select value="20" t="highway" v="footway"/>
+				<!-- Roads closed to all vehicles (C3) -->
+				<select value="20" t="vehicle" v="no"/>
+			</ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></ifnot></ifnot></ifnot>
+			</ifnot></ifnot></if>
+		</way>
+
 		<way attribute="priority">
 			<if param="node_network_prefer">
 				<ifnot t="route_bicycle">

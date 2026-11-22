@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="walk_with_bike_to">Stap af en loop naar %1$s</string>
+	<string name="walk_with_bike_to_destination">Stap af en loop naar je bestemming</string>
+	<string name="walk_with_bike">Stap af en loop met je fiets</string>
+	<string name="walk_with_bike_end">Stap weer op je fiets</string>
+	<string name="routing_attr_allow_walking_with_bike_name">Met de fiets aan de hand lopen</string>
+	<string name="routing_attr_allow_walking_with_bike_description">Waar je niet mag fietsen (voetgangerszones, voetpaden, borden \"fietsers afstappen\"), kan de route je met de fiets aan de hand laten lopen. Je hoort wanneer je moet afstappen en weer opstappen.</string>
 	<string name="bikes">Fietsen</string>
 	<string name="bike_button">Fiets</string>
 	<string name="bike_button_descr">Wissel tussen je fietsen. Elke fiets heeft een eigen type, rijstijl en batterijen.</string>

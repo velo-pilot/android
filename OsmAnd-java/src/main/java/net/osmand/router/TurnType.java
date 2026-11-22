@@ -130,8 +130,14 @@ public class TurnType {
 //		return null;
 	}
 
+	// Walking beside the bike (speed pedelec): this turn is where the rider steps off or gets back on
+	public static final int WALK_NONE = 0;
+	public static final int WALK_START = 1;
+	public static final int WALK_END = 2;
+
 	private final int value;
 	private int exitOut;
+	private int walkWithBike = WALK_NONE;
 	// calculated clockwise head rotation if previous direction to NORTH
 	private float turnAngle;
 	private boolean skipToSpeak;
@@ -431,6 +437,22 @@ public class TurnType {
 	
 	public void setSkipToSpeak(boolean skipToSpeak) {
 		this.skipToSpeak = skipToSpeak;
+	}
+
+	public int getWalkWithBike() {
+		return walkWithBike;
+	}
+
+	public void setWalkWithBike(int walkWithBike) {
+		this.walkWithBike = walkWithBike;
+	}
+
+	public boolean isWalkStart() {
+		return walkWithBike == WALK_START;
+	}
+
+	public boolean isWalkEnd() {
+		return walkWithBike == WALK_END;
 	}
 	
 	@Override

@@ -125,6 +125,16 @@ public abstract class CommandBuilder {
 
 	public abstract CommandBuilder then();
 
+	/** Whether {@link #speak(String)} is heard: only text-to-speech voices can say free text. */
+	public boolean canSpeakText() {
+		return false;
+	}
+
+	/** Free text for text-to-speech voices, e.g. "step off and walk to ..." (speed pedelec). */
+	public CommandBuilder speak(String text) {
+		return this;
+	}
+
 	public abstract CommandBuilder gpsLocationLost();
 
 	public abstract CommandBuilder gpsLocationRecover();
@@ -138,7 +148,7 @@ public abstract class CommandBuilder {
 		return this;
 	}
 
-	private void addToCommandList(String name, Object... args) {
+	protected void addToCommandList(String name, Object... args) {
 		listCommands.add(name);
 		for (Object o : args) {
 			if (o != null) {

@@ -11,6 +11,12 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="walk_with_bike_to">Step off and walk to %1$s</string>
+	<string name="walk_with_bike_to_destination">Step off and walk to your destination</string>
+	<string name="walk_with_bike">Step off and walk with your bike</string>
+	<string name="walk_with_bike_end">Get back on your bike</string>
+	<string name="routing_attr_allow_walking_with_bike_name">Allow walking with the bike</string>
+	<string name="routing_attr_allow_walking_with_bike_description">Where you may not ride (pedestrian zones, footways, dismount signs), the route can have you walk beside the bike, and tells you when to step off and get back on.</string>
 	<string name="bikes">Bikes</string>
 	<string name="bike_button">Bike</string>
 	<string name="bike_button_descr">Switch between your bikes. Each bike has its own type, riding mode and batteries.</string>

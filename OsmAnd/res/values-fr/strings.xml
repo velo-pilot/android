@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="walk_with_bike_to">Descendez et marchez jusqu\'à %1$s</string>
+	<string name="walk_with_bike_to_destination">Descendez et marchez jusqu\'à votre destination</string>
+	<string name="walk_with_bike">Descendez et marchez à côté de votre vélo</string>
+	<string name="walk_with_bike_end">Remontez sur votre vélo</string>
+	<string name="routing_attr_allow_walking_with_bike_name">Autoriser à marcher à côté du vélo</string>
+	<string name="routing_attr_allow_walking_with_bike_description">Là où vous ne pouvez pas rouler (zones piétonnes, trottoirs, panneaux « cyclistes, descendez »), l\'itinéraire peut vous faire marcher à côté du vélo, et vous indique quand descendre et remonter.</string>
 	<string name="bikes">Vélos</string>
 	<string name="bike_button">Vélo</string>
 	<string name="bike_button_descr">Passez d\'un vélo à l\'autre. Chaque vélo a son type, son style de conduite et ses batteries.</string>

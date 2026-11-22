@@ -96,6 +96,17 @@ public class RouteDirectionInfo {
 		this.ref = ref;
 	}
 
+	// Street where a walk beside the bike ends (turn with TurnType.WALK_START), null for the destination
+	private String walkToName;
+
+	public String getWalkToName() {
+		return walkToName;
+	}
+
+	public void setWalkToName(String walkToName) {
+		this.walkToName = walkToName;
+	}
+
 	public String getStreetName() {
 		return streetName;
 	}

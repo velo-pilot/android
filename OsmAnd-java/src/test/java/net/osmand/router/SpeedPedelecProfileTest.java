@@ -105,6 +105,7 @@ public class SpeedPedelecProfileTest {
 		Assert.assertEquals(45, router().getMaxSpeed() * 3.6, 0.01);
 	}
 
+	// Riding access (allow_walking_with_bike is not passed): walking beside the bike is WalkingWithBikeTest
 	private static void assertAccess(int expected, Map<String, String> tags, String... params) {
 		RouteDataObject way = way(tags);
 		int access = router(params).getObjContext(RouteDataObjectAttribute.ACCESS).evaluateInt(way, 0);
@@ -123,7 +124,7 @@ public class SpeedPedelecProfileTest {
 		return builder.build(PROFILE, new RoutingMemoryLimits(30, 256), values).router;
 	}
 
-	private static Map<String, String> tags(String... tagValues) {
+	static Map<String, String> tags(String... tagValues) {
 		Map<String, String> tags = new LinkedHashMap<>();
 		for (int i = 0; i < tagValues.length; i += 2) {
 			tags.put(tagValues[i], tagValues[i + 1]);
@@ -131,7 +132,7 @@ public class SpeedPedelecProfileTest {
 		return tags;
 	}
 
-	private static RouteDataObject way(Map<String, String> tags) {
+	static RouteDataObject way(Map<String, String> tags) {
 		RouteRegion region = new RouteRegion();
 		int[] types = new int[tags.size()];
 		int id = 0;
