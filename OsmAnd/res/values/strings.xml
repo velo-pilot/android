@@ -11,6 +11,7 @@
 	Strings for OsmAnd core
 	Thx - Hardy
 -->
+	<string name="walk_with_bike_stairs">Caution, stairs: step off and carry your bike</string>
 	<string name="walk_with_bike_to">Step off and walk to %1$s</string>
 	<string name="walk_with_bike_to_destination">Step off and walk to your destination</string>
 	<string name="walk_with_bike">Step off and walk with your bike</string>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="walk_with_bike_stairs">Attention, escalier : descendez et portez votre vélo</string>
 	<string name="walk_with_bike_to">Descendez et marchez jusqu\'à %1$s</string>
 	<string name="walk_with_bike_to_destination">Descendez et marchez jusqu\'à votre destination</string>
 	<string name="walk_with_bike">Descendez et marchez à côté de votre vélo</string>

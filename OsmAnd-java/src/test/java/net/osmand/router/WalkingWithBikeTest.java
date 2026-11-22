@@ -286,11 +286,41 @@ public class WalkingWithBikeTest {
 	}
 
 	@Test
-	public void testMarkStepsForBicycles() {
-		List<RouteSegmentResult> route = route(segment(tags("highway", "residential"), 100),
-				segment(tags("highway", "steps"), 25), segment(tags("highway", "residential"), 100));
-		RouteResultPreparation.markWalkingWithBike(context("bicycle", ALLOW_WALKING), route);
-		Assert.assertArrayEquals(new int[] {TurnType.WALK_NONE, TurnType.WALK_START, TurnType.WALK_END}, walks(route));
+	public void testStairsAlwaysAnnounced() {
+		for (String profile : new String[] {"bicycle", "e_bike", "cargo_bike"}) {
+			// Even a few metres of stairs, and also with walking switched off: the bicycle rules still use stairs
+			for (String[] params : new String[][] {{ALLOW_WALKING}, {}}) {
+				String msg = profile + " " + String.join(",", params);
+				List<RouteSegmentResult> route = route(segment(tags("highway", "residential"), 100),
+						segment(tags("highway", "steps"), 4), segment(tags("highway", "residential"), 100));
+				RouteResultPreparation.markWalkingWithBike(context(profile, params), route);
+				Assert.assertArrayEquals(msg, new int[] {TurnType.WALK_NONE, TurnType.WALK_START_STAIRS, TurnType.WALK_END}, walks(route));
+				Assert.assertTrue(msg, route.get(1).getTurnType().isWalkStart());
+				Assert.assertFalse(msg, route.get(1).getTurnType().isSkipToSpeak());
+			}
+
+			// Stairs a few metres after stepping off: the stairs phrase, for the whole short walk
+			List<RouteSegmentResult> route = route(segment(tags("highway", "residential"), 100),
+					segment(tags("highway", "footway"), 5), segment(tags("highway", "steps"), 6),
+					segment(tags("highway", "residential"), 100));
+			RouteResultPreparation.markWalkingWithBike(context(profile, ALLOW_WALKING), route);
+			Assert.assertArrayEquals(profile, new int[] {TurnType.WALK_NONE, TurnType.WALK_START_STAIRS,
+					TurnType.WALK_NONE, TurnType.WALK_END}, walks(route));
+
+			// Stairs far into a walk: the rider is already on foot there
+			route = route(segment(tags("highway", "residential"), 100), segment(tags("highway", "pedestrian"), 60),
+					segment(tags("highway", "steps"), 6), segment(tags("highway", "residential"), 100));
+			RouteResultPreparation.markWalkingWithBike(context(profile, ALLOW_WALKING), route);
+			Assert.assertArrayEquals(profile, new int[] {TurnType.WALK_NONE, TurnType.WALK_START,
+					TurnType.WALK_NONE, TurnType.WALK_END}, walks(route));
+
+			// Walking off: footways are ridden as in routing.xml, only the stairs are announced
+			route = route(segment(tags("highway", "residential"), 100), segment(tags("highway", "footway"), 60),
+					segment(tags("highway", "steps"), 6), segment(tags("highway", "residential"), 100));
+			RouteResultPreparation.markWalkingWithBike(context(profile), route);
+			Assert.assertArrayEquals(profile, new int[] {TurnType.WALK_NONE, TurnType.WALK_NONE,
+					TurnType.WALK_START_STAIRS, TurnType.WALK_END}, walks(route));
+		}
 	}
 
 	// ---------------------------------------------------------------- helpers

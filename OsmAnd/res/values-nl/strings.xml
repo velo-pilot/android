@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="walk_with_bike_stairs">Opgelet, trap: stap af en draag je fiets</string>
 	<string name="walk_with_bike_to">Stap af en loop naar %1$s</string>
 	<string name="walk_with_bike_to_destination">Stap af en loop naar je bestemming</string>
 	<string name="walk_with_bike">Stap af en loop met je fiets</string>

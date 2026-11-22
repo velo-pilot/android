@@ -7,7 +7,7 @@ import net.osmand.router.TurnType
 import net.osmand.util.Algorithms
 
 /**
- * Texts for walking beside the bike where a speed pedelec may not ride (pedestrian zones, footways, ...).
+ * Texts for walking beside the bike where it may not be ridden (pedestrian zones, footways, stairs, ...).
  * RouteResultPreparation.markWalkingWithBike marks the turns where a walk starts and ends.
  */
 object WalkWithBikeInstructions {
@@ -29,6 +29,7 @@ object WalkWithBikeInstructions {
 	fun getPhrase(ctx: Context, info: RouteDirectionInfo): String? {
 		val turn = info.turnType
 		return when {
+			turn.isWalkStartStairs -> ctx.getString(R.string.walk_with_bike_stairs)
 			turn.isWalkStart -> {
 				val walkTo = info.walkToName
 				when {

@@ -130,10 +130,12 @@ public class TurnType {
 //		return null;
 	}
 
-	// Walking beside the bike (speed pedelec): this turn is where the rider steps off or gets back on
+	// Walking beside the bike: this turn is where the rider steps off or gets back on
 	public static final int WALK_NONE = 0;
 	public static final int WALK_START = 1;
 	public static final int WALK_END = 2;
+	// A walk that starts with stairs: carry the bike
+	public static final int WALK_START_STAIRS = 3;
 
 	private final int value;
 	private int exitOut;
@@ -448,7 +450,11 @@ public class TurnType {
 	}
 
 	public boolean isWalkStart() {
-		return walkWithBike == WALK_START;
+		return walkWithBike == WALK_START || walkWithBike == WALK_START_STAIRS;
+	}
+
+	public boolean isWalkStartStairs() {
+		return walkWithBike == WALK_START_STAIRS;
 	}
 
 	public boolean isWalkEnd() {

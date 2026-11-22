@@ -275,14 +275,15 @@ public class RouteResultPreparation {
 		addTurnInfoDescriptions(result);
 	}
 
-	// Shorter walks (a footway link at a crossing, the drive to the front door) are not announced
+	// Shorter walks (a footway link at a crossing, the drive to the front door) are not announced, unless they
+	// have stairs: riding into stairs is dangerous
 	static final double MIN_ANNOUNCED_WALK = 20;
 
 	/**
 	 * Profiles with a "walkingSpeed" attribute (speed pedelec, bicycle and the profiles that extend it) give
-	 * ways where the rider walks beside the bike that speed or less (steps, platforms). With the parameter
-	 * allow_walking_with_bike on, marks the turn where each walk starts and ends so the app can say "step off
-	 * and walk" and "get back on your bike".
+	 * ways where the rider walks beside the bike that speed or less (steps, platforms). Marks the turn where
+	 * each walk starts and ends so the app can say "step off and walk" and "get back on your bike". With the
+	 * parameter allow_walking_with_bike off, only stairs are marked: the bicycle profiles still use them.
 	 */
 	public static void markWalkingWithBike(RoutingContext ctx, List<RouteSegmentResult> result) {
 		if (!(ctx.getRouter() instanceof GeneralRouter)) {
@@ -290,22 +291,34 @@ public class RouteResultPreparation {
 		}
 		GeneralRouter router = (GeneralRouter) ctx.getRouter();
 		float walkingSpeed = router.getFloatAttribute(WALKING_SPEED, -1);
-		// Boolean parameters are passed only when on
-		if (walkingSpeed <= 0 || !router.getParameterValues().containsKey(ALLOW_WALKING_WITH_BIKE)) {
+		if (walkingSpeed <= 0) {
 			return;
 		}
+		// Boolean parameters are passed only when on
+		boolean allowWalking = router.getParameterValues().containsKey(ALLOW_WALKING_WITH_BIKE);
 		int start = -1;
 		for (int i = 0; i <= result.size(); i++) {
-			boolean walking = i < result.size() && isWalkingWithBike(router, walkingSpeed, result.get(i));
+			boolean walking = false;
+			if (i < result.size()) {
+				RouteSegmentResult segment = result.get(i);
+				walking = (allowWalking || isStairs(segment)) && isWalkingWithBike(router, walkingSpeed, segment);
+			}
 			if (walking && start == -1) {
 				start = i;
 			} else if (!walking && start != -1) {
 				double distance = 0;
+				boolean stairs = false;
+				boolean startsWithStairs = false;
 				for (int j = start; j < i; j++) {
+					if (isStairs(result.get(j))) {
+						stairs = true;
+						// Stairs close to where the walk starts: say so when the rider steps off
+						startsWithStairs |= distance < MIN_ANNOUNCED_WALK;
+					}
 					distance += result.get(j).getDistance();
 				}
-				if (distance >= MIN_ANNOUNCED_WALK) {
-					markWalkTurn(ctx, result.get(start), TurnType.WALK_START);
+				if (distance >= MIN_ANNOUNCED_WALK || stairs) {
+					markWalkTurn(ctx, result.get(start), startsWithStairs ? TurnType.WALK_START_STAIRS : TurnType.WALK_START);
 					if (i < result.size()) {
 						markWalkTurn(ctx, result.get(i), TurnType.WALK_END);
 					}
@@ -313,6 +326,10 @@ public class RouteResultPreparation {
 				start = -1;
 			}
 		}
+	}
+
+	private static boolean isStairs(RouteSegmentResult segment) {
+		return "steps".equals(segment.getObject().getHighway());
 	}
 
 	public static final String WALKING_SPEED = "walkingSpeed";
