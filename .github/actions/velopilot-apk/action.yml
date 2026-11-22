@@ -15,15 +15,16 @@ runs:
       shell: bash
       run: sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/boost
 
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v6
       with:
         distribution: temurin
         java-version: 17
 
-    - uses: gradle/actions/setup-gradle@v4
+    # v5, not v6: from v6 on the caching is a closed-source component under Gradle's Terms of Use
+    - uses: gradle/actions/setup-gradle@v5
 
     # Kotlin/Native toolchain of the multiplatform OsmAnd-shared module
-    - uses: actions/cache@v4
+    - uses: actions/cache@v6
       with:
         path: ~/.konan
         key: konan-${{ runner.os }}-${{ hashFiles('build.gradle', 'OsmAnd-shared/build.gradle.kts') }}
